@@ -1,0 +1,18 @@
+---
+galaxy_info:
+  role_name: moltbot
+  author: karim baidi
+  description: Install and configure a secure, optimized moltbot server
+  license: MIT
+  min_ansible_version: '2.12'
+  platforms:
+    - name: Ubuntu
+      versions:
+        - jammy
+        - focal
+  galaxy_tags:
+    - moltbot
+    - server
+    - security
+
+dependencies: []
