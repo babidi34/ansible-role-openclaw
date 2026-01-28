@@ -1,2 +1,28 @@
 ---
-# Default variables for moltbot role
+# Moltbot role defaults
+
+moltbot_user: moltbot
+moltbot_group: moltbot
+moltbot_home: /home/moltbot
+
+moltbot_config_dir: /etc/moltbot
+moltbot_data_dir: /var/lib/moltbot
+moltbot_log_dir: /var/log/moltbot
+
+# Upstream install script URL (set this)
+moltbot_install_script_url: ""
+
+# Install flags for non-interactive setup if supported
+moltbot_install_flags:
+  - "--no-onboard"
+  - "--no-prompt"
+
+# Workspace
+moltbot_workspace_dir: "{{ moltbot_home }}/clawd"
+
+# Systemd user service
+moltbot_enable_user_service: true
+moltbot_enable_linger: true
+
+# Optional Docker gateway support
+moltbot_use_docker_gateway: false

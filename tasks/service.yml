@@ -1,0 +1,9 @@
+---
+- name: Enable linger for moltbot user
+  ansible.builtin.command: "loginctl enable-linger {{ moltbot_user }}"
+  when: moltbot_enable_linger | bool
+
+- name: Install systemd user service
+  ansible.builtin.command: "moltbot onboard --install-daemon"
+  become: true
+  become_user: "{{ moltbot_user }}"

@@ -1,0 +1,13 @@
+---
+- name: Create Moltbot directories
+  ansible.builtin.file:
+    path: "{{ item }}"
+    state: directory
+    owner: "{{ moltbot_user }}"
+    group: "{{ moltbot_group }}"
+    mode: "0750"
+  loop:
+    - "{{ moltbot_config_dir }}"
+    - "{{ moltbot_data_dir }}"
+    - "{{ moltbot_log_dir }}"
+    - "{{ moltbot_workspace_dir }}"

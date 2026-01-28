@@ -1,0 +1,12 @@
+---
+- name: Download Moltbot install script
+  ansible.builtin.get_url:
+    url: "{{ moltbot_install_script_url }}"
+    dest: /tmp/moltbot-install.sh
+    mode: "0755"
+
+- name: Run Moltbot install script
+  ansible.builtin.shell: >
+    /tmp/moltbot-install.sh {{ moltbot_install_flags | join(' ') }}
+  args:
+    creates: /usr/local/bin/moltbot

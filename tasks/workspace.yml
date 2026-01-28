@@ -1,0 +1,4 @@
+---
+- name: Initialize workspace (manual step placeholder)
+  ansible.builtin.debug:
+    msg: "Run 'moltbot setup' or equivalent to bootstrap the workspace."

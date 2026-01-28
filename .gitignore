@@ -2,3 +2,5 @@
 *.log
 .cache/
 __pycache__/
+
+roadmap.md

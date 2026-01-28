@@ -1,0 +1,14 @@
+---
+- name: Ensure group exists
+  ansible.builtin.group:
+    name: "{{ moltbot_group }}"
+    system: true
+
+- name: Ensure user exists
+  ansible.builtin.user:
+    name: "{{ moltbot_user }}"
+    group: "{{ moltbot_group }}"
+    home: "{{ moltbot_home }}"
+    shell: /bin/bash
+    create_home: true
+    system: true

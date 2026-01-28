@@ -1,2 +1,19 @@
 ---
-# Tasks for moltbot role
+- name: Preflight checks
+  ansible.builtin.include_tasks: preflight.yml
+
+- name: Create user and group
+  ansible.builtin.include_tasks: user.yml
+
+- name: Create directories
+  ansible.builtin.include_tasks: directories.yml
+
+- name: Install Moltbot CLI
+  ansible.builtin.include_tasks: install.yml
+
+- name: Bootstrap workspace
+  ansible.builtin.include_tasks: workspace.yml
+
+- name: Configure systemd user service
+  ansible.builtin.include_tasks: service.yml
+  when: moltbot_enable_user_service | bool

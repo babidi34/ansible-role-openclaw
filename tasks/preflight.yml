@@ -1,0 +1,12 @@
+---
+- name: Require install script URL
+  ansible.builtin.assert:
+    that:
+      - moltbot_install_script_url | length > 0
+    fail_msg: "Set moltbot_install_script_url to the upstream install.sh URL"
+
+- name: Ensure runtime is supported
+  ansible.builtin.assert:
+    that:
+      - ansible_facts['os_family'] == 'Debian'
+    fail_msg: "Only Debian/Ubuntu are supported for now"

@@ -1,0 +1,23 @@
+---
+dependency:
+  name: galaxy
+
+driver:
+  name: docker
+
+platforms:
+  - name: ubuntu-22
+    image: geerlingguy/docker-ubuntu2204-ansible:latest
+    pre_build_image: true
+    command: /lib/systemd/systemd
+    privileged: true
+
+provisioner:
+  name: ansible
+  log: true
+
+lint: |
+  ansible-lint
+
+verifier:
+  name: ansible
