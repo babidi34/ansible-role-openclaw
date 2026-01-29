@@ -17,7 +17,7 @@ molecule:
   before_script:
     - python -V
     - pip install --upgrade pip
-    - pip install "ansible==2.14.*" molecule molecule-plugins[docker] ansible-lint
+    - pip install "ansible-core==2.14.*" molecule molecule-plugins[docker] ansible-lint
     - ansible --version
     - docker info
   script:
