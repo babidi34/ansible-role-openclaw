@@ -3,7 +3,7 @@ stages:
 
 molecule:
   stage: test
-  image: python:3.11
+  image: python:3.10
   services:
     - name: docker:26-dind
       command: ["--host=tcp://0.0.0.0:2375", "--tls=false"]
