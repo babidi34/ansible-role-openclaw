@@ -1,0 +1,24 @@
+---
+- name: Verify
+  hosts: all
+  gather_facts: false
+  tasks:
+    - name: Check moltbot binary exists
+      ansible.builtin.stat:
+        path: /usr/local/bin/moltbot
+      register: moltbot_bin
+
+    - name: Assert moltbot binary present
+      ansible.builtin.assert:
+        that:
+          - moltbot_bin.stat.exists
+
+    - name: Check config file exists
+      ansible.builtin.stat:
+        path: /home/moltbot/.clawdbot/moltbot.json
+      register: moltbot_cfg
+
+    - name: Assert config file present
+      ansible.builtin.assert:
+        that:
+          - moltbot_cfg.stat.exists

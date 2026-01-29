@@ -9,15 +9,29 @@ platforms:
   - name: ubuntu-22
     image: geerlingguy/docker-ubuntu2204-ansible:latest
     pre_build_image: true
-    command: /lib/systemd/systemd
-    privileged: true
+    command: /bin/bash -c "sleep infinity"
 
 provisioner:
   name: ansible
   log: true
+  config_options:
+    defaults:
+      local_tmp: /tmp/ansible-local
+      remote_tmp: /var/tmp/ansible-remote
+      roles_path: /tmp/ansible-roles:/home/linux-man/.ansible/roles:/etc/ansible/roles:/usr/share/ansible/roles
+      async_dir: /tmp/ansible-async
+  env:
+    ANSIBLE_ASYNC_DIR: /tmp/ansible-async
+  inventory:
+    host_vars:
+      ubuntu-22:
+        ansible_user: root
+        ansible_connection: docker
 
 lint: |
   ansible-lint
 
 verifier:
   name: ansible
+  options:
+    v: true

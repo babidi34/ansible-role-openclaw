@@ -1,0 +1,21 @@
+{
+  "llm": {
+    "provider": "{{ moltbot_llm_provider }}",
+    "api_key": "{{ moltbot_llm_api_key }}",
+    "model": "{{ moltbot_llm_model }}",
+    "base_url": "{{ moltbot_llm_base_url }}",
+    "timeout": {{ moltbot_llm_timeout }}
+  },
+  "channels": {{ moltbot_channels_config | to_nice_json }},
+  "actions": {
+    "allowlist": {{ moltbot_actions_allowlist | to_nice_json }},
+    "denylist": {{ moltbot_actions_denylist | to_nice_json }},
+    "timeout": {{ moltbot_actions_timeout }}
+  },
+  "memory": {
+    "backend": "{{ moltbot_memory_backend }}",
+    "dsn": "{{ moltbot_memory_dsn }}",
+    "vector_db_url": "{{ moltbot_vector_db_url }}",
+    "vector_db_api_key": "{{ moltbot_vector_db_api_key }}"
+  }
+}

@@ -1,4 +1,10 @@
 ---
 - name: Initialize workspace (manual step placeholder)
-  ansible.builtin.debug:
-    msg: "Run 'moltbot setup' or equivalent to bootstrap the workspace."
+  ansible.builtin.command: "{{ moltbot_cli_name }} setup"
+  become: true
+  become_user: "{{ moltbot_user }}"
+  environment:
+    HOME: "{{ moltbot_home }}"
+  args:
+    creates: "{{ moltbot_workspace_dir }}/AGENTS.md"
+  when: moltbot_workspace_init | bool

@@ -1,9 +1,11 @@
 ---
-- name: Require install script URL
+- name: Validate install method and source
   ansible.builtin.assert:
     that:
-      - moltbot_install_script_url | length > 0
-    fail_msg: "Set moltbot_install_script_url to the upstream install.sh URL"
+      - moltbot_install_method in ["url", "file"]
+      - (moltbot_install_method == "url" and (moltbot_install_script_url | length > 0)) or
+        (moltbot_install_method == "file" and (moltbot_install_script_file | length > 0))
+    fail_msg: "Set moltbot_install_method (url|file) and the matching script source"
 
 - name: Ensure runtime is supported
   ansible.builtin.assert:

@@ -11,8 +11,23 @@
 - name: Install Moltbot CLI
   ansible.builtin.include_tasks: install.yml
 
-- name: Bootstrap workspace
-  ansible.builtin.include_tasks: workspace.yml
+- name: Validate LLM settings
+  ansible.builtin.include_tasks: llm.yml
+
+- name: Validate actions settings
+  ansible.builtin.include_tasks: actions.yml
+
+- name: Validate memory settings
+  ansible.builtin.include_tasks: memory.yml
+
+- name: Render configuration
+  ansible.builtin.include_tasks: config.yml
+
+- name: Ensure workspace files
+  ansible.builtin.include_tasks: workspace_files.yml
+
+- name: Configure channels
+  ansible.builtin.include_tasks: channels.yml
 
 - name: Configure systemd user service
   ansible.builtin.include_tasks: service.yml

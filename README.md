@@ -8,7 +8,6 @@ Role Ansible pour installer et configurer un serveur Moltbot (assistant IA auton
 - Acces reseau sortant HTTPS vers les APIs (LLM + services)
 - Runtime:
   - CLI via script officiel (installe Node.js 22+)
-  - Docker optionnel (gateway conteneurise)
 
 ## Ce que fait le role (cible)
 - Installe le CLI via le script officiel `install.sh` (automation possible via `--no-onboard --no-prompt`)
@@ -16,7 +15,6 @@ Role Ansible pour installer et configurer un serveur Moltbot (assistant IA auton
 - Prepare le workspace par defaut `~/clawd`
 - Installe le service systemd (user service) via `moltbot onboard --install-daemon`
 - Prepare les channels (Telegram/Discord/WhatsApp)
-- Optionnel: installation Docker + docker compose (gateway isole)
 
 ## Fichiers et chemins importants (upstream)
 - Config principale: `~/.clawdbot/moltbot.json`

@@ -2,11 +2,19 @@
 - name: Download Moltbot install script
   ansible.builtin.get_url:
     url: "{{ moltbot_install_script_url }}"
-    dest: /tmp/moltbot-install.sh
+    dest: "{{ moltbot_install_script_path }}"
     mode: "0755"
+  when: moltbot_install_method == "url"
+
+- name: Copy Moltbot install script
+  ansible.builtin.copy:
+    src: "{{ moltbot_install_script_file }}"
+    dest: "{{ moltbot_install_script_path }}"
+    mode: "0755"
+  when: moltbot_install_method == "file"
 
 - name: Run Moltbot install script
-  ansible.builtin.shell: >
-    /tmp/moltbot-install.sh {{ moltbot_install_flags | join(' ') }}
+  ansible.builtin.command:
+    argv: "{{ [moltbot_install_script_path] + moltbot_install_flags }}"
   args:
-    creates: /usr/local/bin/moltbot
+    creates: "{{ moltbot_install_creates }}"

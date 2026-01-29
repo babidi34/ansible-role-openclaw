@@ -8,9 +8,24 @@ moltbot_home: /home/moltbot
 moltbot_config_dir: /etc/moltbot
 moltbot_data_dir: /var/lib/moltbot
 moltbot_log_dir: /var/log/moltbot
+moltbot_tmp_dir: /tmp/moltbot
+
+# CLI binary
+moltbot_cli_name: moltbot
+moltbot_cli_bin: /usr/local/bin/moltbot
+
+# Upstream paths
+moltbot_upstream_dir: "{{ moltbot_home }}/.clawdbot"
+moltbot_upstream_credentials_dir: "{{ moltbot_upstream_dir }}/credentials"
+moltbot_upstream_agents_dir: "{{ moltbot_upstream_dir }}/agents"
+moltbot_upstream_sessions_dir: "{{ moltbot_upstream_agents_dir }}/{{ moltbot_agent_id | default('default') }}/sessions"
 
 # Upstream install script URL (set this)
 moltbot_install_script_url: ""
+moltbot_install_method: url   # url|file
+moltbot_install_script_file: "" # when method=file, path inside role files/
+moltbot_install_script_path: /tmp/moltbot-install.sh
+moltbot_install_creates: "{{ moltbot_cli_bin }}"
 
 # Install flags for non-interactive setup if supported
 moltbot_install_flags:
@@ -19,10 +34,55 @@ moltbot_install_flags:
 
 # Workspace
 moltbot_workspace_dir: "{{ moltbot_home }}/clawd"
+moltbot_workspace_init: true
+moltbot_workspace_files:
+  - AGENTS.md
+  - BOOTSTRAP.md
+  - IDENTITY.md
+  - SOUL.md
+  - TOOLS.md
+  - USER.md
 
 # Systemd user service
 moltbot_enable_user_service: true
 moltbot_enable_linger: true
+moltbot_linger_file: "/var/lib/systemd/linger/{{ moltbot_user }}"
+moltbot_user_service_unit_path: "{{ moltbot_home }}/.config/systemd/user/moltbot.service"
 
-# Optional Docker gateway support
-moltbot_use_docker_gateway: false
+# Core config (placeholder, to be templated later)
+moltbot_config_path: "{{ moltbot_upstream_dir }}/moltbot.json"
+moltbot_config_owner: "{{ moltbot_user }}"
+moltbot_config_group: "{{ moltbot_group }}"
+moltbot_config_mode: "0640"
+moltbot_config_content: "{}"
+
+# Channels (placeholders)
+moltbot_channels_enabled: []
+moltbot_channels_config: {}
+
+# LLM (placeholders)
+moltbot_llm_provider: ""
+moltbot_llm_api_key: ""
+moltbot_llm_model: ""
+moltbot_llm_base_url: ""
+moltbot_llm_timeout: 60
+
+# Actions policy (placeholders)
+moltbot_actions_allowlist: []
+moltbot_actions_denylist:
+  - rm
+  - shutdown
+  - reboot
+  - mkfs
+  - dd
+moltbot_actions_timeout: 30
+
+# SSH outgoing (optional)
+moltbot_ssh_private_key_path: ""
+moltbot_ssh_known_hosts_path: ""
+
+# Memory backend (optional)
+moltbot_memory_backend: ""
+moltbot_memory_dsn: ""
+moltbot_vector_db_url: ""
+moltbot_vector_db_api_key: ""

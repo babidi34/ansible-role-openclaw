@@ -11,3 +11,7 @@
     - "{{ moltbot_data_dir }}"
     - "{{ moltbot_log_dir }}"
     - "{{ moltbot_workspace_dir }}"
+    - "{{ moltbot_upstream_dir }}"
+    - "{{ moltbot_upstream_credentials_dir }}"
+    - "{{ moltbot_upstream_agents_dir }}"
+    - "{{ moltbot_tmp_dir }}"

@@ -1,0 +1,24 @@
+stages:
+  - test
+
+molecule:
+  stage: test
+  image: python:3.11
+  services:
+    - name: docker:26-dind
+      command: ["--host=tcp://0.0.0.0:2375", "--tls=false"]
+  variables:
+    DOCKER_HOST: tcp://docker:2375
+    DOCKER_TLS_CERTDIR: ""
+    MOLECULE_EPHEMERAL_DIRECTORY: /tmp/molecule
+    ANSIBLE_LOCAL_TMP: /tmp/ansible-local
+    ANSIBLE_REMOTE_TMP: /tmp/ansible-remote
+    ANSIBLE_ASYNC_DIR: /tmp/ansible-async
+  before_script:
+    - python -V
+    - pip install --upgrade pip
+    - pip install "ansible==2.14.*" molecule molecule-plugins[docker] ansible-lint
+    - ansible --version
+    - docker info
+  script:
+    - molecule test

@@ -1,0 +1,10 @@
+---
+- name: Ensure workspace files exist
+  ansible.builtin.file:
+    path: "{{ moltbot_workspace_dir }}/{{ item }}"
+    state: touch
+    owner: "{{ moltbot_user }}"
+    group: "{{ moltbot_group }}"
+    mode: "0640"
+  loop: "{{ moltbot_workspace_files }}"
+  when: moltbot_workspace_init | bool

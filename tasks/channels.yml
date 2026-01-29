@@ -1,0 +1,4 @@
+---
+- name: Configure channels (placeholder)
+  ansible.builtin.debug:
+    msg: "Channel configuration is provider-specific; use moltbot CLI or API."

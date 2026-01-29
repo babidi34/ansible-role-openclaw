@@ -1,6 +1,7 @@
 ---
 galaxy_info:
   role_name: moltbot
+  namespace: babidi34
   author: karim baidi
   description: Install and configure a secure, optimized moltbot server
   license: MIT

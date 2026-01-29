@@ -1,0 +1,7 @@
+---
+- name: Validate LLM settings
+  ansible.builtin.assert:
+    that:
+      - moltbot_llm_provider | length > 0
+      - moltbot_llm_model | length > 0
+    fail_msg: "Set moltbot_llm_provider and moltbot_llm_model"
