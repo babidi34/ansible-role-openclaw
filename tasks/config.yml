@@ -10,7 +10,7 @@
 - name: Render Moltbot .env
   ansible.builtin.template:
     src: moltbot.env.j2
-    dest: "{{ moltbot_config_dir }}/moltbot.env"
+    dest: "{{ moltbot_env_path }}"
     owner: "{{ moltbot_config_owner }}"
     group: "{{ moltbot_config_group }}"
     mode: "0600"

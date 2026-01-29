@@ -40,7 +40,65 @@ Role Ansible pour installer et configurer un serveur Moltbot (assistant IA auton
 - Logs sans secrets en clair
 
 ## Role Variables
-Voir `defaults/main.yml` et `vars/main.yml` (a completer).
+### Variables principales
+- `moltbot_user` (defaut: `moltbot`)
+- `moltbot_group` (defaut: `moltbot`)
+- `moltbot_home` (defaut: `/home/moltbot`)
+- `moltbot_cli_name` (defaut: `moltbot`)
+- `moltbot_cli_bin` (defaut: `/usr/local/bin/moltbot`)
+
+### Installation
+- `moltbot_install_method`: `url` ou `file`
+- `moltbot_install_script_url`: URL `install.sh` upstream (si `url`)
+- `moltbot_install_script_file`: fichier dans `files/` (si `file`)
+- `moltbot_install_flags`: flags non-interactifs (defaut `--no-onboard --no-prompt`)
+
+### Dossiers
+- `moltbot_config_dir`: `/etc/moltbot`
+- `moltbot_data_dir`: `/var/lib/moltbot`
+- `moltbot_log_dir`: `/var/log/moltbot`
+- `moltbot_tmp_dir`: `/tmp/moltbot`
+- `moltbot_upstream_dir`: `~/.clawdbot`
+
+### Workspace
+- `moltbot_workspace_dir`: `~/clawd`
+- `moltbot_workspace_init`: true/false
+- `moltbot_workspace_files`: liste de fichiers workspace
+
+### Gateway
+- `moltbot_gateway_bind`: `loopback` (par defaut)
+- `moltbot_gateway_port`: `18789`
+- `moltbot_gateway_auth_env`: nom de variable env (defaut `CLAWDBOT_GATEWAY_TOKEN`)
+- `moltbot_gateway_auth_token`: valeur du token (sera ecrit dans `.env`)
+
+### Agents & sandbox
+- `moltbot_model_primary`: modele principal (ex: `gpt-4o-mini`)
+- `moltbot_model_fallbacks`: liste de fallbacks
+- `moltbot_models_allowlist`: map des modeles autorises
+- `moltbot_sandbox_mode`: `off|non-main|all`
+- `moltbot_sandbox_workspace_access`: `none|ro|rw`
+
+### LLM (cles dans .env)
+- `moltbot_llm_provider`: openai|anthropic|mistral|google|openrouter|ollama
+- `moltbot_llm_api_key`: cle API generique (fallback)
+- `moltbot_llm_openai_api_key`
+- `moltbot_llm_anthropic_api_key`
+- `moltbot_llm_mistral_api_key`
+- `moltbot_llm_google_api_key`
+- `moltbot_llm_openrouter_api_key`
+- `moltbot_llm_ollama_base_url`
+
+### Channels
+- `moltbot_telegram_enabled`: true/false
+- `moltbot_telegram_bot_token`: token Telegram (dans `.env`)
+- `moltbot_telegram_dm_policy`: `pairing` par defaut
+- `moltbot_telegram_allow_from`: liste d'IDs autorises
+- `moltbot_telegram_groups`: map de groupes
+- `moltbot_telegram_config_writes`: true/false
+
+### Systemd user service
+- `moltbot_enable_user_service`: true/false
+- `moltbot_enable_linger`: true/false
 
 ## Dependencies
 Aucune.

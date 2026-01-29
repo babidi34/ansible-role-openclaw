@@ -1,21 +1,30 @@
 {
-  "llm": {
-    "provider": "{{ moltbot_llm_provider }}",
-    "api_key": "{{ moltbot_llm_api_key }}",
-    "model": "{{ moltbot_llm_model }}",
-    "base_url": "{{ moltbot_llm_base_url }}",
-    "timeout": {{ moltbot_llm_timeout }}
+  "agents": {
+    "defaults": {
+      "workspace": "{{ moltbot_workspace_dir }}",
+      "sandbox": {
+        "mode": "{{ moltbot_sandbox_mode }}",
+        "workspaceAccess": "{{ moltbot_sandbox_workspace_access }}"
+      }{% if moltbot_model_primary | length > 0 %},
+      "model": {
+        "primary": "{{ moltbot_model_primary }}"{% if moltbot_model_fallbacks | length > 0 %},
+        "fallbacks": {{ moltbot_model_fallbacks | to_nice_json }}{% endif %}
+      }{% endif %}{% if moltbot_models_allowlist | length > 0 %},
+      "models": {{ moltbot_models_allowlist | to_nice_json }}{% endif %}
+    }
   },
-  "channels": {{ moltbot_channels_config | to_nice_json }},
-  "actions": {
-    "allowlist": {{ moltbot_actions_allowlist | to_nice_json }},
-    "denylist": {{ moltbot_actions_denylist | to_nice_json }},
-    "timeout": {{ moltbot_actions_timeout }}
-  },
-  "memory": {
-    "backend": "{{ moltbot_memory_backend }}",
-    "dsn": "{{ moltbot_memory_dsn }}",
-    "vector_db_url": "{{ moltbot_vector_db_url }}",
-    "vector_db_api_key": "{{ moltbot_vector_db_api_key }}"
-  }
+  "gateway": {
+    "bind": "{{ moltbot_gateway_bind }}",
+    "port": {{ moltbot_gateway_port }},
+    "auth": {
+      "token": "${{ moltbot_gateway_auth_env }}"
+    }
+  }{% set channels = {} %}{% if moltbot_telegram_enabled %}{% set _ = channels.update({"telegram": {
+      "botToken": "${TELEGRAM_BOT_TOKEN}",
+      "dmPolicy": moltbot_telegram_dm_policy,
+      "allowFrom": moltbot_telegram_allow_from,
+      "groups": moltbot_telegram_groups,
+      "configWrites": moltbot_telegram_config_writes
+    }}) %}{% endif %}{% if channels | length > 0 %},
+  "channels": {{ channels | to_nice_json }}{% endif %}
 }

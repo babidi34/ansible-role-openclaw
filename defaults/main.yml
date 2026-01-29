@@ -55,17 +55,45 @@ moltbot_config_owner: "{{ moltbot_user }}"
 moltbot_config_group: "{{ moltbot_group }}"
 moltbot_config_mode: "0640"
 moltbot_config_content: "{}"
+moltbot_env_path: "{{ moltbot_upstream_dir }}/.env"
+
+# Gateway
+moltbot_gateway_bind: "loopback"
+moltbot_gateway_port: 18789
+moltbot_gateway_auth_env: "CLAWDBOT_GATEWAY_TOKEN"
+moltbot_gateway_auth_token: ""
+
+# Agents / models
+moltbot_model_primary: ""
+moltbot_model_fallbacks: []
+moltbot_models_allowlist: {}
+moltbot_sandbox_mode: "non-main"  # off|non-main|all
+moltbot_sandbox_workspace_access: "rw"  # none|ro|rw
 
 # Channels (placeholders)
 moltbot_channels_enabled: []
 moltbot_channels_config: {}
 
+# Telegram channel
+moltbot_telegram_enabled: false
+moltbot_telegram_bot_token: ""
+moltbot_telegram_dm_policy: "pairing"
+moltbot_telegram_allow_from: []
+moltbot_telegram_groups: {}
+moltbot_telegram_config_writes: false
+
 # LLM (placeholders)
-moltbot_llm_provider: ""
+moltbot_llm_provider: ""  # openai|anthropic|mistral|google|openrouter|ollama
 moltbot_llm_api_key: ""
 moltbot_llm_model: ""
 moltbot_llm_base_url: ""
 moltbot_llm_timeout: 60
+moltbot_llm_openai_api_key: ""
+moltbot_llm_anthropic_api_key: ""
+moltbot_llm_mistral_api_key: ""
+moltbot_llm_google_api_key: ""
+moltbot_llm_openrouter_api_key: ""
+moltbot_llm_ollama_base_url: "http://127.0.0.1:11434"
 
 # Actions policy (placeholders)
 moltbot_actions_allowlist: []

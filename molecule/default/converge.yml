@@ -7,7 +7,6 @@
         moltbot_install_method: file
         moltbot_install_script_file: moltbot-install.sh
         moltbot_install_script_url: ""
-        moltbot_llm_provider: dummy
-        moltbot_llm_model: dummy
+        moltbot_model_primary: dummy/model
         moltbot_workspace_init: false
         moltbot_enable_user_service: false
