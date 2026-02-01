@@ -1,0 +1,31 @@
+---
+# Secure OpenClaw deployment with firewall and hardening
+- name: Deploy OpenClaw (secure)
+  hosts: all
+  become: yes
+
+  vars:
+    # LLM Configuration
+    openclaw_llm_provider: "anthropic"
+    openclaw_llm_anthropic_api_key: "{{ vault_anthropic_key }}"
+
+    # Security
+    openclaw_security_hardening: true
+    openclaw_security_firewall: true
+    openclaw_gateway_password: "{{ vault_gateway_password }}"
+
+    # Monitoring
+    openclaw_healthcheck_enabled: true
+
+    # MCP Servers (secure setup)
+    openclaw_mcp_servers_defaults:
+      - name: filesystem
+        enabled: true
+        command: npx
+        args:
+          - "-y"
+          - "@modelcontextprotocol/server-filesystem"
+          - "/home/openclaw/.openclaw/workspace"
+
+  roles:
+    - role: openclaw

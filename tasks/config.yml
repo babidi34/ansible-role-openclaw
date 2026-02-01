@@ -1,16 +1,16 @@
 ---
 - name: Render Moltbot JSON config
   ansible.builtin.template:
-    src: moltbot.json.j2
-    dest: "{{ moltbot_config_path }}"
-    owner: "{{ moltbot_config_owner }}"
-    group: "{{ moltbot_config_group }}"
-    mode: "{{ moltbot_config_mode }}"
+    src: openclaw.json.j2
+    dest: "{{ openclaw_config_path }}"
+    owner: "{{ openclaw_config_owner }}"
+    group: "{{ openclaw_config_group }}"
+    mode: "{{ openclaw_config_mode }}"
 
 - name: Render Moltbot .env
   ansible.builtin.template:
-    src: moltbot.env.j2
-    dest: "{{ moltbot_env_path }}"
-    owner: "{{ moltbot_config_owner }}"
-    group: "{{ moltbot_config_group }}"
+    src: openclaw.env.j2
+    dest: "{{ openclaw_env_path }}"
+    owner: "{{ openclaw_config_owner }}"
+    group: "{{ openclaw_config_group }}"
     mode: "0600"

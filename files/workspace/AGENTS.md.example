@@ -1,0 +1,14 @@
+# Agent Configuration
+
+This file configures the behavior of your OpenClaw agent.
+
+## Available Tools
+
+- bash: Execute shell commands
+- browser: Web browsing and automation
+- read/write/edit: File operations
+- git: Version control operations
+
+## Custom Instructions
+
+Add your custom agent instructions here.

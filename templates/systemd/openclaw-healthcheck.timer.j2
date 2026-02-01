@@ -1,0 +1,11 @@
+[Unit]
+Description=OpenClaw Healthcheck Timer
+After=openclaw.service
+
+[Timer]
+OnBootSec=5min
+OnUnitActiveSec=15min
+Unit=openclaw-healthcheck.service
+
+[Install]
+WantedBy=timers.target

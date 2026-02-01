@@ -2,6 +2,6 @@
 - name: Ensure actions allowlist/denylist are lists
   ansible.builtin.assert:
     that:
-      - moltbot_actions_allowlist is iterable
-      - moltbot_actions_denylist is iterable
+      - openclaw_actions_allowlist is iterable
+      - openclaw_actions_denylist is iterable
     fail_msg: "Set allowlist/denylist as lists"

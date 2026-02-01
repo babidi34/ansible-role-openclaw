@@ -1,0 +1,25 @@
+---
+# Multi-LLM deployment with fallback
+- name: Deploy OpenClaw with multi-LLM support
+  hosts: all
+  become: yes
+
+  vars:
+    # Primary model
+    openclaw_model_primary: "anthropic/claude-opus-4-5"
+
+    # Fallback models
+    openclaw_model_fallbacks:
+      - "openai/gpt-4"
+      - "openai/gpt-3.5-turbo"
+
+    # API Keys for all providers
+    openclaw_llm_anthropic_api_key: "{{ vault_anthropic_key }}"
+    openclaw_llm_openai_api_key: "{{ vault_openai_key }}"
+
+    # Sandbox configuration
+    openclaw_sandbox_mode: "non-main"
+    openclaw_sandbox_workspace_access: "rw"
+
+  roles:
+    - role: openclaw

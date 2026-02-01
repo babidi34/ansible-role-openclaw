@@ -1,24 +1,18 @@
 ---
-- name: Validate LLM settings
-  ansible.builtin.assert:
-    that:
-      - (moltbot_model_primary | length > 0) or (moltbot_models_allowlist | length > 0)
-    fail_msg: "Set moltbot_model_primary or moltbot_models_allowlist"
-
 - name: Validate LLM provider when set
   ansible.builtin.assert:
     that:
-      - moltbot_llm_provider in ["", "openai", "anthropic", "mistral", "google", "openrouter", "ollama"]
-    fail_msg: "moltbot_llm_provider must be one of openai|anthropic|mistral|google|openrouter|ollama"
+      - openclaw_llm_provider in ["", "openai", "anthropic", "mistral", "google", "openrouter", "ollama"]
+    fail_msg: "openclaw_llm_provider must be one of openai|anthropic|mistral|google|openrouter|ollama"
 
 - name: Validate provider credentials when set
   ansible.builtin.assert:
     that:
-      - (moltbot_llm_provider == "ollama") or (moltbot_llm_api_key | length > 0) or
-        (moltbot_llm_openai_api_key | length > 0) or
-        (moltbot_llm_anthropic_api_key | length > 0) or
-        (moltbot_llm_mistral_api_key | length > 0) or
-        (moltbot_llm_google_api_key | length > 0) or
-        (moltbot_llm_openrouter_api_key | length > 0)
+      - (openclaw_llm_provider == "ollama") or (openclaw_llm_api_key | length > 0) or
+        (openclaw_llm_openai_api_key | length > 0) or
+        (openclaw_llm_anthropic_api_key | length > 0) or
+        (openclaw_llm_mistral_api_key | length > 0) or
+        (openclaw_llm_google_api_key | length > 0) or
+        (openclaw_llm_openrouter_api_key | length > 0)
     fail_msg: "Set at least one API key (or use ollama with local base URL)"
-  when: moltbot_llm_provider | length > 0
+  when: openclaw_llm_provider | length > 0

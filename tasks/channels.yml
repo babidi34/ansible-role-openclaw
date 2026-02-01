@@ -2,10 +2,10 @@
 - name: Validate Telegram channel settings
   ansible.builtin.assert:
     that:
-      - moltbot_telegram_bot_token | length > 0
-    fail_msg: "Set moltbot_telegram_bot_token when Telegram is enabled"
-  when: moltbot_telegram_enabled | bool
+      - openclaw_telegram_bot_token | length > 0
+    fail_msg: "Set openclaw_telegram_bot_token when Telegram is enabled"
+  when: openclaw_telegram_enabled | bool
 
 - name: Configure channels (placeholder)
   ansible.builtin.debug:
-    msg: "Channel configuration is provider-specific; use moltbot CLI or API."
+    msg: "Channel configuration is provider-specific; use openclaw CLI or API."

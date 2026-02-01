@@ -1,41 +1,45 @@
 ---
-# Moltbot role defaults
+# OpenClaw role defaults
 
-moltbot_user: moltbot
-moltbot_group: moltbot
-moltbot_home: /home/moltbot
+openclaw_user: openclaw
+openclaw_group: openclaw
+openclaw_home: /home/openclaw
 
-moltbot_config_dir: /etc/moltbot
-moltbot_data_dir: /var/lib/moltbot
-moltbot_log_dir: /var/log/moltbot
-moltbot_tmp_dir: /tmp/moltbot
+openclaw_config_dir: /etc/openclaw
+openclaw_data_dir: /var/lib/openclaw
+openclaw_log_dir: /var/log/openclaw
+openclaw_tmp_dir: /tmp/openclaw
 
 # CLI binary
-moltbot_cli_name: moltbot
-moltbot_cli_bin: /usr/local/bin/moltbot
+openclaw_cli_name: openclaw
+openclaw_cli_bin: /usr/local/bin/openclaw
 
-# Upstream paths
-moltbot_upstream_dir: "{{ moltbot_home }}/.clawdbot"
-moltbot_upstream_credentials_dir: "{{ moltbot_upstream_dir }}/credentials"
-moltbot_upstream_agents_dir: "{{ moltbot_upstream_dir }}/agents"
-moltbot_upstream_sessions_dir: "{{ moltbot_upstream_agents_dir }}/{{ moltbot_agent_id | default('default') }}/sessions"
+# Upstream paths (new openclaw structure)
+openclaw_upstream_dir: "{{ openclaw_home }}/.openclaw"
+openclaw_upstream_credentials_dir: "{{ openclaw_upstream_dir }}/credentials"
+openclaw_upstream_agents_dir: "{{ openclaw_upstream_dir }}/agents"
+openclaw_upstream_sessions_dir: "{{ openclaw_upstream_agents_dir }}/{{ openclaw_agent_id | default('default') }}/sessions"
 
-# Upstream install script URL (set this)
-moltbot_install_script_url: ""
-moltbot_install_method: url   # url|file
-moltbot_install_script_file: "" # when method=file, path inside role files/
-moltbot_install_script_path: /tmp/moltbot-install.sh
-moltbot_install_creates: "{{ moltbot_cli_bin }}"
+# Installation method
+openclaw_install_method: npm  # npm|npm-source|url|file
+openclaw_npm_package: "openclaw@latest"
+openclaw_npm_registry: "https://registry.npmjs.org"
+
+# Legacy install script support (deprecated, use npm method instead)
+openclaw_install_script_url: "https://install.openclaw.ai/install.sh"
+openclaw_install_script_file: "" # when method=file, path inside role files/
+openclaw_install_script_path: /tmp/openclaw-install.sh
+openclaw_install_creates: "{{ openclaw_cli_bin }}"
 
 # Install flags for non-interactive setup if supported
-moltbot_install_flags:
+openclaw_install_flags:
   - "--no-onboard"
   - "--no-prompt"
 
-# Workspace
-moltbot_workspace_dir: "{{ moltbot_home }}/clawd"
-moltbot_workspace_init: true
-moltbot_workspace_files:
+# Workspace (new openclaw structure)
+openclaw_workspace_dir: "{{ openclaw_upstream_dir }}/workspace"
+openclaw_workspace_init: true
+openclaw_workspace_files:
   - AGENTS.md
   - BOOTSTRAP.md
   - IDENTITY.md
@@ -44,73 +48,161 @@ moltbot_workspace_files:
   - USER.md
 
 # Systemd user service
-moltbot_enable_user_service: true
-moltbot_enable_linger: true
-moltbot_linger_file: "/var/lib/systemd/linger/{{ moltbot_user }}"
-moltbot_user_service_unit_path: "{{ moltbot_home }}/.config/systemd/user/moltbot.service"
+openclaw_enable_user_service: true
+openclaw_enable_linger: true
+openclaw_linger_file: "/var/lib/systemd/linger/{{ openclaw_user }}"
+openclaw_user_service_unit_path: "{{ openclaw_home }}/.config/systemd/user/openclaw.service"
 
-# Core config (placeholder, to be templated later)
-moltbot_config_path: "{{ moltbot_upstream_dir }}/moltbot.json"
-moltbot_config_owner: "{{ moltbot_user }}"
-moltbot_config_group: "{{ moltbot_group }}"
-moltbot_config_mode: "0640"
-moltbot_config_content: "{}"
-moltbot_env_path: "{{ moltbot_upstream_dir }}/.env"
+# Core config
+openclaw_config_path: "{{ openclaw_upstream_dir }}/openclaw.json"
+openclaw_config_owner: "{{ openclaw_user }}"
+openclaw_config_group: "{{ openclaw_group }}"
+openclaw_config_mode: "0640"
+openclaw_config_content: "{}"
+openclaw_env_path: "{{ openclaw_upstream_dir }}/.env"
 
 # Gateway
-moltbot_gateway_bind: "loopback"
-moltbot_gateway_port: 18789
-moltbot_gateway_auth_env: "CLAWDBOT_GATEWAY_TOKEN"
-moltbot_gateway_auth_token: ""
+openclaw_gateway_bind: "loopback"
+openclaw_gateway_port: 18789
+openclaw_gateway_auth_env: "OPENCLAW_GATEWAY_TOKEN"
+openclaw_gateway_auth_token: ""
+openclaw_gateway_password: ""
 
 # Agents / models
-moltbot_model_primary: ""
-moltbot_model_fallbacks: []
-moltbot_models_allowlist: {}
-moltbot_sandbox_mode: "non-main"  # off|non-main|all
-moltbot_sandbox_workspace_access: "rw"  # none|ro|rw
+openclaw_model_primary: ""
+openclaw_model_fallbacks: []
+openclaw_models_allowlist: {}
+openclaw_sandbox_mode: "non-main"  # off|non-main|all
+openclaw_sandbox_workspace_access: "rw"  # none|ro|rw
 
 # Channels (placeholders)
-moltbot_channels_enabled: []
-moltbot_channels_config: {}
+openclaw_channels_enabled: []
+openclaw_channels_config: {}
 
 # Telegram channel
-moltbot_telegram_enabled: false
-moltbot_telegram_bot_token: ""
-moltbot_telegram_dm_policy: "pairing"
-moltbot_telegram_allow_from: []
-moltbot_telegram_groups: {}
-moltbot_telegram_config_writes: false
+openclaw_telegram_enabled: false
+openclaw_telegram_bot_token: ""
+openclaw_telegram_dm_policy: "pairing"
+openclaw_telegram_allow_from: []
+openclaw_telegram_groups: {}
+openclaw_telegram_config_writes: false
 
-# LLM (placeholders)
-moltbot_llm_provider: ""  # openai|anthropic|mistral|google|openrouter|ollama
-moltbot_llm_api_key: ""
-moltbot_llm_model: ""
-moltbot_llm_base_url: ""
-moltbot_llm_timeout: 60
-moltbot_llm_openai_api_key: ""
-moltbot_llm_anthropic_api_key: ""
-moltbot_llm_mistral_api_key: ""
-moltbot_llm_google_api_key: ""
-moltbot_llm_openrouter_api_key: ""
-moltbot_llm_ollama_base_url: "http://127.0.0.1:11434"
+# LLM providers
+openclaw_llm_provider: ""  # openai|anthropic|mistral|google|openrouter|ollama
+openclaw_llm_api_key: ""
+openclaw_llm_model: ""
+openclaw_llm_base_url: ""
+openclaw_llm_timeout: 60
+openclaw_llm_openai_api_key: ""
+openclaw_llm_anthropic_api_key: ""
+openclaw_llm_mistral_api_key: ""
+openclaw_llm_google_api_key: ""
+openclaw_llm_openrouter_api_key: ""
+openclaw_llm_ollama_base_url: "http://127.0.0.1:11434"
 
-# Actions policy (placeholders)
-moltbot_actions_allowlist: []
-moltbot_actions_denylist:
+# Actions policy
+openclaw_actions_allowlist: []
+openclaw_actions_denylist:
   - rm
   - shutdown
   - reboot
   - mkfs
   - dd
-moltbot_actions_timeout: 30
+openclaw_actions_timeout: 30
 
 # SSH outgoing (optional)
-moltbot_ssh_private_key_path: ""
-moltbot_ssh_known_hosts_path: ""
+openclaw_ssh_private_key_path: ""
+openclaw_ssh_known_hosts_path: ""
 
 # Memory backend (optional)
-moltbot_memory_backend: ""
-moltbot_memory_dsn: ""
-moltbot_vector_db_url: ""
-moltbot_vector_db_api_key: ""
+openclaw_memory_backend: ""
+openclaw_memory_dsn: ""
+openclaw_vector_db_url: ""
+openclaw_vector_db_api_key: ""
+
+# Node.js installation (for npm method)
+openclaw_nodejs_version: "22"
+openclaw_nodejs_install: true
+openclaw_nodejs_nodesource_repo: "node_{{ openclaw_nodejs_version }}.x"
+
+# MCP Servers Configuration
+openclaw_mcp_servers_enabled: true
+openclaw_mcp_servers: []
+
+# MCP servers par défaut (tous désactivés par défaut)
+openclaw_mcp_servers_defaults:
+  - name: filesystem
+    enabled: false
+    command: npx
+    args:
+      - "-y"
+      - "@modelcontextprotocol/server-filesystem"
+      - "{{ openclaw_workspace_dir }}"
+    description: "Access to workspace filesystem"
+
+  - name: github
+    enabled: false
+    command: npx
+    args:
+      - "-y"
+      - "@modelcontextprotocol/server-github"
+    env:
+      GITHUB_PERSONAL_ACCESS_TOKEN: "{{ openclaw_github_token | default('') }}"
+    description: "GitHub integration (issues, PRs, repos)"
+
+  - name: gitlab
+    enabled: false
+    command: npx
+    args:
+      - "-y"
+      - "@modelcontextprotocol/server-gitlab"
+    env:
+      GITLAB_PERSONAL_ACCESS_TOKEN: "{{ openclaw_gitlab_token | default('') }}"
+      GITLAB_API_URL: "{{ openclaw_gitlab_api_url | default('https://gitlab.com/api/v4') }}"
+    description: "GitLab integration (issues, MRs, repos)"
+
+  - name: docker
+    enabled: false
+    command: npx
+    args:
+      - "-y"
+      - "@modelcontextprotocol/server-docker"
+    env:
+      DOCKER_HOST: "{{ openclaw_docker_host | default('unix:///var/run/docker.sock') }}"
+    description: "Docker container management"
+
+# MCP tokens
+openclaw_github_token: ""
+openclaw_gitlab_token: ""
+openclaw_gitlab_api_url: "https://gitlab.com/api/v4"
+openclaw_docker_host: "unix:///var/run/docker.sock"
+
+# Credentials management
+openclaw_credentials: {}
+# Example structure:
+# openclaw_credentials:
+#   anthropic:
+#     api_key: "{{ vault_openclaw_anthropic_key }}"
+#   openai:
+#     api_key: "{{ vault_openclaw_openai_key }}"
+#   github:
+#     token: "{{ vault_openclaw_github_token }}"
+
+# Security hardening
+openclaw_security_hardening: true
+openclaw_security_firewall: false
+
+# Network restrictions
+openclaw_gateway_public: false
+openclaw_tailscale_mode: "off"  # off|serve|funnel
+openclaw_tailscale_enabled: false
+openclaw_tailscale_reset_on_exit: true
+
+# Resource limits (for systemd service)
+openclaw_memory_max: "2G"
+openclaw_nofile_limit: 65536
+
+# Monitoring
+openclaw_healthcheck_enabled: false
+openclaw_log_retention_days: 30
+openclaw_log_max_size: "100M"

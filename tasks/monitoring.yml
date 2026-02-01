@@ -1,0 +1,50 @@
+---
+# Deploy healthcheck script
+- name: Copy healthcheck script
+  ansible.builtin.copy:
+    src: healthcheck.sh
+    dest: /usr/local/bin/openclaw-healthcheck.sh
+    owner: root
+    group: root
+    mode: '0755'
+  become: true
+  when: openclaw_healthcheck_enabled | bool
+
+# Deploy healthcheck systemd service
+- name: Deploy healthcheck service
+  ansible.builtin.template:
+    src: systemd/openclaw-healthcheck.service.j2
+    dest: "{{ openclaw_home }}/.config/systemd/user/openclaw-healthcheck.service"
+    owner: "{{ openclaw_user }}"
+    group: "{{ openclaw_group }}"
+    mode: '0644'
+  become: true
+  when: openclaw_healthcheck_enabled | bool
+
+# Deploy healthcheck timer
+- name: Deploy healthcheck timer
+  ansible.builtin.template:
+    src: systemd/openclaw-healthcheck.timer.j2
+    dest: "{{ openclaw_home }}/.config/systemd/user/openclaw-healthcheck.timer"
+    owner: "{{ openclaw_user }}"
+    group: "{{ openclaw_group }}"
+    mode: '0644'
+  become: true
+  when: openclaw_healthcheck_enabled | bool
+
+# Enable healthcheck timer
+- name: Enable healthcheck timer
+  ansible.builtin.systemd:
+    name: openclaw-healthcheck.timer
+    enabled: true
+    state: started
+    scope: user
+    daemon_reload: true
+  become: true
+  become_user: "{{ openclaw_user }}"
+  when: openclaw_healthcheck_enabled | bool
+
+- name: Display monitoring status
+  ansible.builtin.debug:
+    msg: "Healthcheck monitoring enabled - checks every 15 minutes"
+  when: openclaw_healthcheck_enabled | bool

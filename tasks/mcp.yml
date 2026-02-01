@@ -1,0 +1,56 @@
+---
+# Validate MCP servers configuration
+- name: Verify npx is available (required for MCP servers)
+  ansible.builtin.command: npx --version
+  register: npx_version
+  changed_when: false
+  failed_when: npx_version.rc != 0
+
+- name: Display npx version
+  ansible.builtin.debug:
+    msg: "npx version: {{ npx_version.stdout }}"
+
+# Validate GitHub MCP server configuration
+- name: Check GitHub MCP server token
+  ansible.builtin.assert:
+    that:
+      - openclaw_github_token | length > 0
+    fail_msg: "GitHub MCP server is enabled but openclaw_github_token is not set"
+  when: openclaw_mcp_servers_defaults | selectattr('name', 'equalto', 'github') | selectattr('enabled', 'equalto', true) | list | length > 0
+
+# Validate GitLab MCP server configuration
+- name: Check GitLab MCP server token
+  ansible.builtin.assert:
+    that:
+      - openclaw_gitlab_token | length > 0
+    fail_msg: "GitLab MCP server is enabled but openclaw_gitlab_token is not set"
+  when: openclaw_mcp_servers_defaults | selectattr('name', 'equalto', 'gitlab') | selectattr('enabled', 'equalto', true) | list | length > 0
+
+# Validate Docker MCP server configuration
+- name: Check Docker socket access for MCP Docker server
+  ansible.builtin.stat:
+    path: /var/run/docker.sock
+  register: docker_socket
+  when: openclaw_mcp_servers_defaults | selectattr('name', 'equalto', 'docker') | selectattr('enabled', 'equalto', true) | list | length > 0
+
+- name: Ensure Docker socket exists
+  ansible.builtin.assert:
+    that:
+      - docker_socket.stat.exists
+    fail_msg: "Docker MCP server is enabled but Docker socket not found at /var/run/docker.sock"
+  when:
+    - openclaw_mcp_servers_defaults | selectattr('name', 'equalto', 'docker') | selectattr('enabled', 'equalto', true) | list | length > 0
+    - docker_socket is defined
+
+- name: Add openclaw user to docker group
+  ansible.builtin.user:
+    name: "{{ openclaw_user }}"
+    groups: docker
+    append: true
+  become: true
+  when: openclaw_mcp_servers_defaults | selectattr('name', 'equalto', 'docker') | selectattr('enabled', 'equalto', true) | list | length > 0
+
+# Display enabled MCP servers
+- name: List enabled MCP servers
+  ansible.builtin.debug:
+    msg: "Enabled MCP servers: {{ (openclaw_mcp_servers_defaults | selectattr('enabled', 'equalto', true) | map(attribute='name') | list) + (openclaw_mcp_servers | map(attribute='name') | list) }}"

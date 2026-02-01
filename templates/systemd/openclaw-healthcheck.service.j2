@@ -1,0 +1,11 @@
+[Unit]
+Description=OpenClaw Healthcheck
+After=openclaw.service
+
+[Service]
+Type=oneshot
+User={{ openclaw_user }}
+Group={{ openclaw_group }}
+ExecStart=/usr/local/bin/openclaw-healthcheck.sh
+StandardOutput=journal
+StandardError=journal

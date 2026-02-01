@@ -1,0 +1,67 @@
+---
+# Check current Node.js version
+- name: Check if Node.js is installed
+  ansible.builtin.command: node --version
+  register: nodejs_current_version
+  changed_when: false
+  failed_when: false
+
+- name: Parse Node.js version
+  ansible.builtin.set_fact:
+    nodejs_version_major: "{{ nodejs_current_version.stdout | regex_replace('^v([0-9]+).*', '\\1') }}"
+  when: nodejs_current_version.rc == 0
+
+- name: Display current Node.js version
+  ansible.builtin.debug:
+    msg: "Current Node.js version: {{ nodejs_current_version.stdout }}"
+  when: nodejs_current_version.rc == 0
+
+# Install Node.js if version is too old or not installed
+- name: Add NodeSource APT repository
+  ansible.builtin.shell: |
+    curl -fsSL https://deb.nodesource.com/setup_{{ openclaw_nodejs_version }}.x | bash -
+  args:
+    creates: /etc/apt/sources.list.d/nodesource.list
+  become: true
+  when: >
+    nodejs_current_version.rc != 0 or
+    (nodejs_version_major is defined and nodejs_version_major | int < openclaw_nodejs_version | int)
+
+- name: Install Node.js
+  ansible.builtin.apt:
+    name: nodejs
+    state: present
+    update_cache: true
+  become: true
+  when: >
+    nodejs_current_version.rc != 0 or
+    (nodejs_version_major is defined and nodejs_version_major | int < openclaw_nodejs_version | int)
+
+# Verify Node.js installation
+- name: Verify Node.js version after installation
+  ansible.builtin.command: node --version
+  register: nodejs_final_version
+  changed_when: false
+
+- name: Display final Node.js version
+  ansible.builtin.debug:
+    msg: "Node.js version installed: {{ nodejs_final_version.stdout }}"
+
+# Verify npm is available
+- name: Verify npm is installed
+  ansible.builtin.command: npm --version
+  register: npm_version
+  changed_when: false
+
+- name: Display npm version
+  ansible.builtin.debug:
+    msg: "npm version: {{ npm_version.stdout }}"
+
+# Install pnpm if npm-source method is used
+- name: Install pnpm globally
+  community.general.npm:
+    name: pnpm
+    global: true
+    state: present
+  become: true
+  when: openclaw_install_method == "npm-source"

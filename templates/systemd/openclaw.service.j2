@@ -1,0 +1,34 @@
+[Unit]
+Description=OpenClaw AI Assistant
+Documentation=https://openclaw.ai/
+After=network.target
+
+[Service]
+Type=simple
+User={{ openclaw_user }}
+Group={{ openclaw_group }}
+WorkingDirectory={{ openclaw_home }}
+ExecStart={{ openclaw_cli_bin }} gateway --port {{ openclaw_gateway_port }}
+Restart=on-failure
+RestartSec=10
+Environment="PATH=/usr/local/bin:/usr/bin:/bin"
+EnvironmentFile={{ openclaw_env_path }}
+
+# Security hardening
+{% if openclaw_security_hardening %}
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths={{ openclaw_upstream_dir }}
+NoNewPrivileges=yes
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+{% endif %}
+
+# Resource limits
+LimitNOFILE={{ openclaw_nofile_limit }}
+{% if openclaw_memory_max | length > 0 %}
+MemoryMax={{ openclaw_memory_max }}
+{% endif %}
+
+[Install]
+WantedBy=default.target

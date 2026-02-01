@@ -1,20 +1,79 @@
 ---
-- name: Download Moltbot install script
-  ansible.builtin.get_url:
-    url: "{{ moltbot_install_script_url }}"
-    dest: "{{ moltbot_install_script_path }}"
-    mode: "0755"
-  when: moltbot_install_method == "url"
+# Installation via npm (recommended)
+- name: Install OpenClaw via npm
+  community.general.npm:
+    name: "{{ openclaw_npm_package }}"
+    global: true
+    state: present
+    registry: "{{ openclaw_npm_registry }}"
+  become: true
+  when: openclaw_install_method == "npm"
 
-- name: Copy Moltbot install script
-  ansible.builtin.copy:
-    src: "{{ moltbot_install_script_file }}"
-    dest: "{{ moltbot_install_script_path }}"
-    mode: "0755"
-  when: moltbot_install_method == "file"
+# Installation from source via git
+- name: Clone OpenClaw repository
+  ansible.builtin.git:
+    repo: https://github.com/openclaw/openclaw.git
+    dest: /tmp/openclaw-source
+    version: main
+  when: openclaw_install_method == "npm-source"
 
-- name: Run Moltbot install script
+- name: Install OpenClaw from source
   ansible.builtin.command:
-    argv: "{{ [moltbot_install_script_path] + moltbot_install_flags }}"
+    cmd: pnpm install && pnpm build
+    chdir: /tmp/openclaw-source
+  when: openclaw_install_method == "npm-source"
+
+- name: Link OpenClaw binary from source
+  ansible.builtin.command:
+    cmd: pnpm link --global
+    chdir: /tmp/openclaw-source
+  when: openclaw_install_method == "npm-source"
+
+# Legacy install script support (deprecated)
+- name: Download OpenClaw install script
+  ansible.builtin.get_url:
+    url: "{{ openclaw_install_script_url }}"
+    dest: "{{ openclaw_install_script_path }}"
+    mode: "0755"
+  when: openclaw_install_method == "url"
+
+- name: Detect stub OpenClaw CLI
+  ansible.builtin.command: "{{ openclaw_cli_bin }} --version"
+  register: openclaw_cli_version
+  changed_when: false
+  failed_when: false
+  when: openclaw_install_method == "url"
+
+- name: Remove stub OpenClaw CLI if present
+  ansible.builtin.file:
+    path: "{{ openclaw_cli_bin }}"
+    state: absent
+  when:
+    - openclaw_install_method == "url"
+    - openclaw_cli_version.stdout is defined
+    - "'GNU coreutils' in openclaw_cli_version.stdout"
+
+- name: Copy OpenClaw install script
+  ansible.builtin.copy:
+    src: "{{ openclaw_install_script_file }}"
+    dest: "{{ openclaw_install_script_path }}"
+    mode: "0755"
+  when: openclaw_install_method == "file"
+
+- name: Run OpenClaw install script
+  ansible.builtin.command:
+    argv: "{{ [openclaw_install_script_path] + openclaw_install_flags }}"
   args:
-    creates: "{{ moltbot_install_creates }}"
+    creates: "{{ openclaw_install_creates }}"
+  when: openclaw_install_method in ["url", "file"]
+
+# Verify installation
+- name: Verify OpenClaw CLI is installed
+  ansible.builtin.command: "{{ openclaw_cli_bin }} --version"
+  register: openclaw_version_check
+  changed_when: false
+  failed_when: openclaw_version_check.rc != 0
+
+- name: Display OpenClaw version
+  ansible.builtin.debug:
+    msg: "OpenClaw version: {{ openclaw_version_check.stdout }}"

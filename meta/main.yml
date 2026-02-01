@@ -1,9 +1,9 @@
 ---
 galaxy_info:
-  role_name: moltbot
+  role_name: openclaw
   namespace: babidi34
   author: karim baidi
-  description: Install and configure a secure, optimized moltbot server
+  description: Install and configure a secure OpenClaw AI assistant with MCP server support
   license: MIT
   min_ansible_version: '2.12'
   platforms:
@@ -12,8 +12,11 @@ galaxy_info:
         - jammy
         - focal
   galaxy_tags:
-    - moltbot
-    - server
+    - openclaw
+    - ai
+    - assistant
+    - mcp
+    - llm
     - security
 
 dependencies: []

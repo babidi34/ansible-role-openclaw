@@ -1,6 +1,6 @@
+.vagrant/
+.vscode/
 *.retry
-*.log
-.cache/
+*.pyc
 __pycache__/
-
-roadmap.md
+.molecule/

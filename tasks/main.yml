@@ -8,11 +8,19 @@
 - name: Create directories
   ansible.builtin.include_tasks: directories.yml
 
-- name: Install Moltbot CLI
+- name: Install Node.js (if using npm method)
+  ansible.builtin.include_tasks: nodejs.yml
+  when: openclaw_install_method in ['npm', 'npm-source'] and openclaw_nodejs_install | bool
+
+- name: Install OpenClaw CLI
   ansible.builtin.include_tasks: install.yml
 
 - name: Validate LLM settings
   ansible.builtin.include_tasks: llm.yml
+
+- name: Validate MCP servers configuration
+  ansible.builtin.include_tasks: mcp.yml
+  when: openclaw_mcp_servers_enabled | bool
 
 - name: Validate actions settings
   ansible.builtin.include_tasks: actions.yml
@@ -23,6 +31,10 @@
 - name: Render configuration
   ansible.builtin.include_tasks: config.yml
 
+- name: Deploy credentials
+  ansible.builtin.include_tasks: credentials.yml
+  when: openclaw_credentials | length > 0
+
 - name: Ensure workspace files
   ansible.builtin.include_tasks: workspace_files.yml
 
@@ -31,4 +43,8 @@
 
 - name: Configure systemd user service
   ansible.builtin.include_tasks: service.yml
-  when: moltbot_enable_user_service | bool
+  when: openclaw_enable_user_service | bool
+
+- name: Configure firewall
+  ansible.builtin.include_tasks: firewall.yml
+  when: openclaw_security_firewall | bool

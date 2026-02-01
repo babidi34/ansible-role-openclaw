@@ -1,0 +1,59 @@
+---
+# OpenClaw with MCP servers (Filesystem, GitHub, GitLab, Docker)
+- name: Deploy OpenClaw with MCP servers
+  hosts: all
+  become: yes
+
+  vars:
+    # LLM Configuration
+    openclaw_llm_provider: "anthropic"
+    openclaw_llm_anthropic_api_key: "{{ vault_anthropic_key }}"
+
+    # MCP Servers - Enable the ones you need
+    openclaw_mcp_servers_defaults:
+      - name: filesystem
+        enabled: true
+        command: npx
+        args:
+          - "-y"
+          - "@modelcontextprotocol/server-filesystem"
+          - "/home/openclaw/.openclaw/workspace"
+        description: "Access to workspace filesystem"
+
+      - name: github
+        enabled: true
+        command: npx
+        args:
+          - "-y"
+          - "@modelcontextprotocol/server-github"
+        env:
+          GITHUB_PERSONAL_ACCESS_TOKEN: "{{ openclaw_github_token }}"
+        description: "GitHub integration"
+
+      - name: gitlab
+        enabled: false  # Set to true if needed
+        command: npx
+        args:
+          - "-y"
+          - "@modelcontextprotocol/server-gitlab"
+        env:
+          GITLAB_PERSONAL_ACCESS_TOKEN: "{{ openclaw_gitlab_token }}"
+          GITLAB_API_URL: "https://gitlab.com/api/v4"
+        description: "GitLab integration"
+
+      - name: docker
+        enabled: true
+        command: npx
+        args:
+          - "-y"
+          - "@modelcontextprotocol/server-docker"
+        env:
+          DOCKER_HOST: "unix:///var/run/docker.sock"
+        description: "Docker container management"
+
+    # MCP Tokens
+    openclaw_github_token: "{{ vault_github_token }}"
+    openclaw_gitlab_token: "{{ vault_gitlab_token | default('') }}"
+
+  roles:
+    - role: openclaw

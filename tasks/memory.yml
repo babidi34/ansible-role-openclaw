@@ -2,5 +2,5 @@
 - name: Validate memory settings
   ansible.builtin.assert:
     that:
-      - moltbot_memory_backend is string
-    fail_msg: "Set moltbot_memory_backend"
+      - openclaw_memory_backend is string
+    fail_msg: "Set openclaw_memory_backend"
