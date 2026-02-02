@@ -1,42 +1,19 @@
 ---
-- name: Enable linger for openclaw user
-  ansible.builtin.command: "loginctl enable-linger {{ openclaw_user }}"
-  args:
-    creates: "{{ openclaw_linger_file }}"
-  when: openclaw_enable_linger | bool
-
-- name: Ensure user systemd directory exists
-  ansible.builtin.file:
-    path: "{{ openclaw_home }}/.config/systemd/user"
-    state: directory
-    owner: "{{ openclaw_user }}"
-    group: "{{ openclaw_group }}"
-    mode: "0700"
-  when: openclaw_enable_user_service | bool
-
-- name: Deploy hardened systemd service file
+- name: Deploy systemd service file
   ansible.builtin.template:
     src: systemd/openclaw.service.j2
-    dest: "{{ openclaw_user_service_unit_path }}"
-    owner: "{{ openclaw_user }}"
-    group: "{{ openclaw_group }}"
+    dest: "{{ openclaw_service_unit_path }}"
+    owner: root
+    group: root
     mode: "0644"
-  become: true
-  when: openclaw_enable_user_service | bool
+  notify: Restart openclaw
 
-- name: Reload systemd user daemon
+- name: Reload systemd daemon
   ansible.builtin.systemd:
     daemon_reload: true
-    scope: user
-  become: true
-  become_user: "{{ openclaw_user }}"
-  when: openclaw_enable_user_service | bool
 
-- name: Enable openclaw service
+- name: Enable and start openclaw service
   ansible.builtin.systemd:
     name: openclaw
     enabled: true
-    scope: user
-  become: true
-  become_user: "{{ openclaw_user }}"
-  when: openclaw_enable_user_service | bool
+    state: started

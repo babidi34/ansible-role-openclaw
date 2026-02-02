@@ -47,11 +47,8 @@ openclaw_workspace_files:
   - TOOLS.md
   - USER.md
 
-# Systemd user service
-openclaw_enable_user_service: true
-openclaw_enable_linger: true
-openclaw_linger_file: "/var/lib/systemd/linger/{{ openclaw_user }}"
-openclaw_user_service_unit_path: "{{ openclaw_home }}/.config/systemd/user/openclaw.service"
+# Systemd service
+openclaw_service_unit_path: /etc/systemd/system/openclaw.service
 
 # Core config
 openclaw_config_path: "{{ openclaw_upstream_dir }}/openclaw.json"
@@ -62,6 +59,7 @@ openclaw_config_content: "{}"
 openclaw_env_path: "{{ openclaw_upstream_dir }}/.env"
 
 # Gateway
+openclaw_gateway_mode: "local"
 openclaw_gateway_bind: "loopback"
 openclaw_gateway_port: 18789
 openclaw_gateway_auth_env: "OPENCLAW_GATEWAY_TOKEN"

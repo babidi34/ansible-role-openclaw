@@ -41,9 +41,8 @@
 - name: Configure channels
   ansible.builtin.include_tasks: channels.yml
 
-- name: Configure systemd user service
+- name: Configure systemd service
   ansible.builtin.include_tasks: service.yml
-  when: openclaw_enable_user_service | bool
 
 - name: Configure firewall
   ansible.builtin.include_tasks: firewall.yml
