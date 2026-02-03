@@ -267,6 +267,10 @@ openclaw_himalaya_verify_folders: false
 # auto_send: openclaw sends replies automatically (use with caution!)
 openclaw_himalaya_reply_policy: "disabled"
 
+# Web Search (Brave Search) - native OpenClaw tool
+# Set API key to enable web search
+openclaw_brave_api_key: ""
+
 # Pass (password-store) integration
 # Provides secure password storage for Himalaya email credentials
 # When enabled, passwords defined in openclaw_himalaya_accounts will be stored in pass

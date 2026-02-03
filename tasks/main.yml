@@ -20,7 +20,7 @@
 
 - name: Validate MCP servers configuration
   ansible.builtin.include_tasks: mcp.yml
-  when: openclaw_mcp_servers_enabled | bool
+  when: openclaw_mcp_servers_enabled | bool and openclaw_mcp_config_enabled | bool
 
 - name: Validate actions settings
   ansible.builtin.include_tasks: actions.yml

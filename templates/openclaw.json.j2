@@ -45,7 +45,14 @@
       "groups": openclaw_telegram_groups,
       "configWrites": openclaw_telegram_config_writes
     }}) %}{% endif %}{% if channels | length > 0 %},
-  "channels": {{ channels | to_nice_json }}{% endif %}{% if openclaw_himalaya_enabled %},
+  "channels": {{ channels | to_nice_json }}{% endif %}{% if openclaw_telegram_enabled %},
+  "plugins": {
+    "entries": {
+      "telegram": {
+        "enabled": true
+      }
+    }
+  }{% endif %}{% if openclaw_himalaya_enabled %},
   "skills": {
     "entries": {
       "himalaya": {
