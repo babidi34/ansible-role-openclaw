@@ -14,6 +14,7 @@
     }
   },
   "gateway": {
+    "mode": "{{ openclaw_gateway_mode }}",
     "bind": "{{ openclaw_gateway_bind }}",
     "port": {{ openclaw_gateway_port }}{% if openclaw_gateway_password | length > 0 %},
     "auth": {
@@ -21,27 +22,29 @@
       "password": "{{ openclaw_gateway_password }}"
     }{% elif openclaw_gateway_auth_token | length > 0 %},
     "auth": {
+      "mode": "token",
       "token": "${{ openclaw_gateway_auth_env }}"
     }{% endif %}{% if openclaw_tailscale_enabled %},
     "tailscale": {
       "mode": "{{ openclaw_tailscale_mode }}",
       "resetOnExit": {{ openclaw_tailscale_reset_on_exit | lower }}
     }{% endif %}
-  }{% set enabled_defaults = openclaw_mcp_servers_defaults | selectattr('enabled', 'equalto', true) | list %}{% set all_mcp_servers = enabled_defaults + openclaw_mcp_servers %}{% if openclaw_mcp_servers_enabled and all_mcp_servers | length > 0 %},
-  "mcpServers": {
-    {% for server in all_mcp_servers %}
-    "{{ server.name }}": {
-      "command": "{{ server.command }}",
-      "args": {{ server.args | to_json }}{% if server.env is defined and server.env | length > 0 %},
-      "env": {{ server.env | to_json }}{% endif %}
-    }{% if not loop.last %},{% endif %}
-    {% endfor %}
-  }{% endif %}{% set channels = {} %}{% if openclaw_telegram_enabled %}{% set _ = channels.update({"telegram": {
+  }{% set channels = {} %}{% if openclaw_telegram_enabled %}{% set _ = channels.update({"telegram": {
       "botToken": "${TELEGRAM_BOT_TOKEN}",
       "dmPolicy": openclaw_telegram_dm_policy,
       "allowFrom": openclaw_telegram_allow_from,
       "groups": openclaw_telegram_groups,
       "configWrites": openclaw_telegram_config_writes
     }}) %}{% endif %}{% if channels | length > 0 %},
-  "channels": {{ channels | to_nice_json }}{% endif %}
+  "channels": {{ channels | to_nice_json }}{% endif %}{% if openclaw_himalaya_enabled %},
+  "skills": {
+    "entries": {
+      "himalaya": {
+        "enabled": true,
+        "config": {
+          "replyPolicy": "{{ openclaw_himalaya_reply_policy }}"
+        }
+      }
+    }
+  }{% endif %}
 }

@@ -41,6 +41,14 @@
 - name: Configure channels
   ansible.builtin.include_tasks: channels.yml
 
+- name: Configure pass (password-store)
+  ansible.builtin.include_tasks: pass.yml
+  when: openclaw_pass_enabled | bool
+
+- name: Configure Himalaya email
+  ansible.builtin.include_tasks: himalaya.yml
+  when: openclaw_himalaya_enabled | bool
+
 - name: Configure systemd service
   ansible.builtin.include_tasks: service.yml
 

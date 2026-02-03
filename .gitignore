@@ -4,3 +4,7 @@
 *.pyc
 __pycache__/
 .molecule/
+test.yml
+.env
+credentials/
+*.asc

@@ -204,3 +204,72 @@ openclaw_nofile_limit: 65536
 openclaw_healthcheck_enabled: false
 openclaw_log_retention_days: 30
 openclaw_log_max_size: "100M"
+
+# Himalaya email integration
+openclaw_himalaya_enabled: false
+openclaw_himalaya_version: "latest"
+openclaw_himalaya_bin: /usr/local/bin/himalaya
+openclaw_himalaya_config_dir: "{{ openclaw_home }}/.config/himalaya"
+openclaw_himalaya_config_path: "{{ openclaw_himalaya_config_dir }}/config.toml"
+
+# Himalaya email accounts
+# Example with password command (RECOMMENDED - secure):
+# openclaw_himalaya_accounts:
+#   - name: "personal"
+#     email: "user@example.com"
+#     display_name: "Mon Nom"
+#     default: true
+#     imap_host: "imap.example.com"
+#     imap_port: 993
+#     smtp_host: "smtp.example.com"
+#     smtp_port: 587
+#     smtp_encryption: "start-tls"  # start-tls|tls
+#     login: "user@example.com"
+#     # Use password_cmd for secure password retrieval (pass, secret-tool, etc.)
+#     password_cmd: "pass show mail/personal"
+#     # OR with secret-tool (GNOME keyring):
+#     # password_cmd: "secret-tool lookup service imap user user@example.com"
+#     # Folder mappings (adjust to match your server's folder names)
+#     folder_sent: "Sent"      # Could be: Sent, "Sent Messages", "Envoyés", "INBOX.Sent"
+#     folder_drafts: "Drafts"  # Could be: Drafts, "Brouillons", "INBOX.Drafts"
+#     folder_trash: "Trash"    # Could be: Trash, "Corbeille", "INBOX.Trash"
+#
+# Example with raw password (NOT RECOMMENDED - stored in cleartext):
+# openclaw_himalaya_accounts:
+#   - name: "personal"
+#     email: "user@example.com"
+#     display_name: "Mon Nom"
+#     default: true
+#     imap_host: "imap.example.com"
+#     imap_port: 993
+#     smtp_host: "smtp.example.com"
+#     smtp_port: 587
+#     smtp_encryption: "start-tls"
+#     login: "user@example.com"
+#     password: "{{ vault_mail_password }}"  # WARNING: stored in cleartext in config
+#     folder_sent: "Sent"
+openclaw_himalaya_accounts: []
+
+# Himalaya folder verification
+# When enabled, the role will check if required IMAP folders exist and create them if missing
+# This helps prevent issues with saving sent messages
+openclaw_himalaya_verify_folders: false
+
+# Himalaya auto-reply policy
+# disabled: no auto-reply
+# manual: openclaw suggests reply but waits for approval
+# auto_draft: openclaw creates draft replies automatically
+# auto_send: openclaw sends replies automatically (use with caution!)
+openclaw_himalaya_reply_policy: "disabled"
+
+# Pass (password-store) integration
+# Provides secure password storage for Himalaya email credentials
+# When enabled, passwords defined in openclaw_himalaya_accounts will be stored in pass
+# and Himalaya will use "pass show mail/<account_name>" to retrieve them
+openclaw_pass_enabled: false
+openclaw_pass_gpg_key_id: ""               # If empty: auto-generates a GPG key; if set: uses existing key
+openclaw_pass_gpg_name: "OpenClaw"         # Name for generated GPG key
+openclaw_pass_gpg_email: "openclaw@localhost"  # Email for generated GPG key
+openclaw_pass_store_dir: "{{ openclaw_home }}/.password-store"
+openclaw_pass_gpg_backup: true             # Export GPG private key to Ansible controller
+openclaw_pass_gpg_backup_path: ""          # Default: playbook_dir/credentials/gpg-<hostname>.asc

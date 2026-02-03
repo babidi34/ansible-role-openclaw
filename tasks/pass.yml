@@ -1,0 +1,214 @@
+---
+# Pass (password-store) installation and configuration
+# This provides secure password storage for Himalaya email credentials
+
+- name: Install pass and GPG packages
+  ansible.builtin.package:
+    name:
+      - pass
+      - gnupg
+    state: present
+
+- name: Ensure .gnupg directory exists
+  ansible.builtin.file:
+    path: "{{ openclaw_home }}/.gnupg"
+    state: directory
+    mode: "0700"
+    owner: "{{ openclaw_user }}"
+    group: "{{ openclaw_group }}"
+
+- name: Configure GPG for headless operation
+  ansible.builtin.copy:
+    dest: "{{ openclaw_home }}/.gnupg/gpg-agent.conf"
+    content: |
+      allow-loopback-pinentry
+      pinentry-program /usr/bin/pinentry-tty
+    mode: "0600"
+    owner: "{{ openclaw_user }}"
+    group: "{{ openclaw_group }}"
+
+- name: Reload gpg-agent configuration
+  ansible.builtin.command:
+    cmd: gpgconf --kill gpg-agent
+  become: true
+  become_user: "{{ openclaw_user }}"
+  environment:
+    HOME: "{{ openclaw_home }}"
+    GNUPGHOME: "{{ openclaw_home }}/.gnupg"
+  changed_when: false
+  failed_when: false
+
+# Check if GPG key already exists
+- name: Check for existing GPG keys
+  ansible.builtin.command:
+    cmd: gpg --list-secret-keys
+  become: true
+  become_user: "{{ openclaw_user }}"
+  environment:
+    HOME: "{{ openclaw_home }}"
+    GNUPGHOME: "{{ openclaw_home }}/.gnupg"
+  register: existing_gpg_keys
+  changed_when: false
+  failed_when: false
+
+# Generate GPG key if none provided and none exists
+- name: Generate GPG key for pass
+  when:
+    - openclaw_pass_gpg_key_id == ""
+    - openclaw_pass_gpg_email not in existing_gpg_keys.stdout
+  block:
+    - name: Create GPG key batch file
+      ansible.builtin.copy:
+        dest: "/tmp/gpg-key-batch-{{ openclaw_user }}"
+        content: |
+          %no-protection
+          Key-Type: RSA
+          Key-Length: 4096
+          Name-Real: {{ openclaw_pass_gpg_name }}
+          Name-Email: {{ openclaw_pass_gpg_email }}
+          Expire-Date: 0
+          %commit
+        mode: "0600"
+        owner: "{{ openclaw_user }}"
+        group: "{{ openclaw_group }}"
+
+    - name: Generate GPG key
+      ansible.builtin.command:
+        cmd: gpg --batch --gen-key /tmp/gpg-key-batch-{{ openclaw_user }}
+      become: true
+      become_user: "{{ openclaw_user }}"
+      environment:
+        HOME: "{{ openclaw_home }}"
+        GNUPGHOME: "{{ openclaw_home }}/.gnupg"
+      register: gpg_gen_result
+
+    - name: Clean up GPG key batch file
+      ansible.builtin.file:
+        path: "/tmp/gpg-key-batch-{{ openclaw_user }}"
+        state: absent
+
+# Get the GPG key ID (either provided or generated)
+- name: Get GPG key ID
+  ansible.builtin.shell: |
+    set -o pipefail
+    gpg --list-keys --keyid-format LONG "{{ openclaw_pass_gpg_email }}" 2>/dev/null | \
+    grep -E '^\s+[A-F0-9]{16,}' | head -1 | awk '{print $1}'
+  args:
+    executable: /bin/bash
+  become: true
+  become_user: "{{ openclaw_user }}"
+  environment:
+    HOME: "{{ openclaw_home }}"
+    GNUPGHOME: "{{ openclaw_home }}/.gnupg"
+  register: gpg_key_id_result
+  changed_when: false
+  when: openclaw_pass_gpg_key_id == ""
+
+- name: Set GPG key ID fact
+  ansible.builtin.set_fact:
+    _openclaw_pass_gpg_key_id: "{{ openclaw_pass_gpg_key_id if openclaw_pass_gpg_key_id != '' else gpg_key_id_result.stdout | trim }}"
+
+- name: Display GPG key ID being used
+  ansible.builtin.debug:
+    msg: "Using GPG key ID: {{ _openclaw_pass_gpg_key_id }}"
+
+# Initialize pass store
+- name: Check if pass store already initialized
+  ansible.builtin.stat:
+    path: "{{ openclaw_pass_store_dir }}/.gpg-id"
+  register: pass_store_init
+
+- name: Initialize pass store
+  ansible.builtin.command:
+    cmd: pass init "{{ _openclaw_pass_gpg_key_id }}"
+  become: true
+  become_user: "{{ openclaw_user }}"
+  environment:
+    HOME: "{{ openclaw_home }}"
+    PASSWORD_STORE_DIR: "{{ openclaw_pass_store_dir }}"
+    GNUPGHOME: "{{ openclaw_home }}/.gnupg"
+  when: not pass_store_init.stat.exists
+
+- name: Ensure pass store has correct permissions
+  ansible.builtin.file:
+    path: "{{ openclaw_pass_store_dir }}"
+    state: directory
+    mode: "0700"
+    owner: "{{ openclaw_user }}"
+    group: "{{ openclaw_group }}"
+    recurse: true
+
+# Add Himalaya email passwords to pass store
+- name: Add Himalaya passwords to pass store
+  ansible.builtin.shell: |
+    set -o pipefail
+    echo "{{ item.password }}" | pass insert -e -f "mail/{{ item.name }}"
+  args:
+    executable: /bin/bash
+  become: true
+  become_user: "{{ openclaw_user }}"
+  environment:
+    HOME: "{{ openclaw_home }}"
+    PASSWORD_STORE_DIR: "{{ openclaw_pass_store_dir }}"
+    GNUPGHOME: "{{ openclaw_home }}/.gnupg"
+  loop: "{{ openclaw_himalaya_accounts | selectattr('password', 'defined') | list }}"
+  loop_control:
+    label: "mail/{{ item.name }}"
+  no_log: true
+  changed_when: true
+  when:
+    - openclaw_himalaya_enabled | default(false)
+    - item.password is defined
+    - item.password_cmd is not defined
+
+# Export GPG key to controller for backup
+- name: Set GPG backup path
+  ansible.builtin.set_fact:
+    _openclaw_gpg_backup_file: "{{ openclaw_pass_gpg_backup_path if openclaw_pass_gpg_backup_path | length > 0 else playbook_dir + '/credentials/gpg-' + inventory_hostname + '.asc' }}"
+  when: openclaw_pass_gpg_backup | bool
+
+- name: Export GPG private key
+  ansible.builtin.shell: |
+    gpg --armor --export-secret-keys "{{ _openclaw_pass_gpg_key_id }}"
+  become: true
+  become_user: "{{ openclaw_user }}"
+  environment:
+    HOME: "{{ openclaw_home }}"
+    GNUPGHOME: "{{ openclaw_home }}/.gnupg"
+  register: gpg_private_key
+  no_log: true
+  changed_when: false
+  when: openclaw_pass_gpg_backup | bool
+
+- name: Ensure credentials directory exists on controller
+  ansible.builtin.file:
+    path: "{{ _openclaw_gpg_backup_file | dirname }}"
+    state: directory
+    mode: "0700"
+  delegate_to: localhost
+  become: false
+  when:
+    - openclaw_pass_gpg_backup | bool
+    - gpg_private_key.stdout is defined
+    - gpg_private_key.stdout | length > 0
+
+- name: Save GPG key to controller
+  ansible.builtin.copy:
+    content: "{{ gpg_private_key.stdout }}"
+    dest: "{{ _openclaw_gpg_backup_file }}"
+    mode: "0600"
+  delegate_to: localhost
+  become: false
+  no_log: true
+  when:
+    - openclaw_pass_gpg_backup | bool
+    - gpg_private_key.stdout is defined
+    - gpg_private_key.stdout | length > 0
+
+- name: Display GPG backup location
+  ansible.builtin.debug:
+    msg: "GPG key backed up to: {{ openclaw_pass_gpg_backup_path | default(playbook_dir + '/credentials/gpg-' + inventory_hostname + '.asc') }}"
+  when:
+    - openclaw_pass_gpg_backup | bool
+    - gpg_private_key.stdout is defined
+    - gpg_private_key.stdout | length > 0

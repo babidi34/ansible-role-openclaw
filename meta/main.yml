@@ -2,7 +2,7 @@
 galaxy_info:
   role_name: openclaw
   namespace: babidi34
-  author: karim baidi
+  author: Karim Baidi
   description: Install and configure a secure OpenClaw AI assistant with MCP server support
   license: MIT
   min_ansible_version: '2.12'

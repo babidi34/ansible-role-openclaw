@@ -1,0 +1,67 @@
+# Himalaya configuration
+# Managed by Ansible - Do not edit manually
+
+{% for account in openclaw_himalaya_accounts %}
+[accounts.{{ account.name }}]
+email = "{{ account.email }}"
+{% if account.display_name is defined %}
+display-name = "{{ account.display_name }}"
+{% endif %}
+{% if account.default | default(false) %}
+default = true
+{% endif %}
+
+# IMAP backend
+backend.type = "imap"
+backend.host = "{{ account.imap_host }}"
+backend.port = {{ account.imap_port | default(993) }}
+backend.login = "{{ account.login }}"
+{% if account.password_cmd is defined %}
+# Secure: password retrieved via command (pass, secret-tool, etc.)
+backend.auth.type = "password"
+backend.auth.cmd = "{{ account.password_cmd }}"
+{% elif openclaw_pass_enabled | default(false) and account.password is defined %}
+# Secure: password retrieved via pass (password-store)
+backend.auth.type = "password"
+backend.auth.cmd = "GNUPGHOME={{ openclaw_home }}/.gnupg PASSWORD_STORE_DIR={{ openclaw_pass_store_dir }} pass show mail/{{ account.name }}"
+{% elif account.password is defined %}
+# Warning: password stored in cleartext - consider enabling openclaw_pass_enabled
+backend.auth.type = "password"
+backend.auth.raw = "{{ account.password }}"
+{% endif %}
+
+# Folder aliases (important: ensure these folders exist on the server)
+folder.aliases.inbox = "{{ account.folder_inbox | default('INBOX') }}"
+folder.aliases.sent = "{{ account.folder_sent | default('Sent') }}"
+{% if account.folder_drafts is defined %}
+folder.aliases.drafts = "{{ account.folder_drafts }}"
+{% endif %}
+{% if account.folder_trash is defined %}
+folder.aliases.trash = "{{ account.folder_trash }}"
+{% endif %}
+
+# SMTP backend for sending
+message.send.backend.type = "smtp"
+message.send.backend.host = "{{ account.smtp_host }}"
+message.send.backend.port = {{ account.smtp_port | default(587) }}
+{% if account.smtp_encryption | default('start-tls') == 'start-tls' %}
+message.send.backend.encryption.type = "start-tls"
+{% elif account.smtp_encryption | default('start-tls') == 'tls' %}
+message.send.backend.encryption.type = "tls"
+{% endif %}
+message.send.backend.login = "{{ account.login }}"
+{% if account.password_cmd is defined %}
+# Secure: password retrieved via command
+message.send.backend.auth.type = "password"
+message.send.backend.auth.cmd = "{{ account.password_cmd }}"
+{% elif openclaw_pass_enabled | default(false) and account.password is defined %}
+# Secure: password retrieved via pass (password-store)
+message.send.backend.auth.type = "password"
+message.send.backend.auth.cmd = "GNUPGHOME={{ openclaw_home }}/.gnupg PASSWORD_STORE_DIR={{ openclaw_pass_store_dir }} pass show mail/{{ account.name }}"
+{% elif account.password is defined %}
+# Warning: password stored in cleartext
+message.send.backend.auth.type = "password"
+message.send.backend.auth.raw = "{{ account.password }}"
+{% endif %}
+
+{% endfor %}

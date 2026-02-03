@@ -9,6 +9,36 @@
   become: true
   when: openclaw_install_method == "npm"
 
+- name: Check configured OpenClaw CLI path
+  ansible.builtin.stat:
+    path: "{{ openclaw_cli_bin }}"
+  register: openclaw_cli_stat
+
+- name: Check OpenClaw CLI in /usr/local/bin
+  ansible.builtin.stat:
+    path: /usr/local/bin/openclaw
+  register: openclaw_cli_local_stat
+
+- name: Check OpenClaw CLI in /usr/bin
+  ansible.builtin.stat:
+    path: /usr/bin/openclaw
+  register: openclaw_cli_usr_stat
+
+- name: Set OpenClaw CLI path from /usr/local/bin when missing
+  ansible.builtin.set_fact:
+    openclaw_cli_bin: /usr/local/bin/openclaw
+  when:
+    - not openclaw_cli_stat.stat.exists
+    - openclaw_cli_local_stat.stat.exists
+
+- name: Set OpenClaw CLI path from /usr/bin when missing
+  ansible.builtin.set_fact:
+    openclaw_cli_bin: /usr/bin/openclaw
+  when:
+    - not openclaw_cli_stat.stat.exists
+    - not openclaw_cli_local_stat.stat.exists
+    - openclaw_cli_usr_stat.stat.exists
+
 # Installation from source via git
 - name: Clone OpenClaw repository
   ansible.builtin.git:

@@ -1,0 +1,22 @@
+---
+# OpenClaw with Telegram channel enabled
+- name: Deploy OpenClaw with Telegram
+  hosts: all
+  become: yes
+
+  vars:
+    # LLM Configuration
+    openclaw_llm_provider: "anthropic"
+    openclaw_llm_anthropic_api_key: "{{ vault_anthropic_key }}"
+
+    # Telegram channel
+    openclaw_telegram_enabled: true
+    openclaw_telegram_bot_token: "{{ vault_telegram_bot_token }}"
+    openclaw_telegram_dm_policy: "allowlist"
+    openclaw_telegram_allow_from:
+      - 123456789
+    openclaw_telegram_groups: {}
+    openclaw_telegram_config_writes: false
+
+  roles:
+    - role: openclaw

@@ -6,6 +6,7 @@
     owner: "{{ openclaw_config_owner }}"
     group: "{{ openclaw_config_group }}"
     mode: "{{ openclaw_config_mode }}"
+  notify: Restart openclaw
 
 - name: Render Moltbot .env
   ansible.builtin.template:
@@ -14,3 +15,4 @@
     owner: "{{ openclaw_config_owner }}"
     group: "{{ openclaw_config_group }}"
     mode: "0600"
+  notify: Restart openclaw

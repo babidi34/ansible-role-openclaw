@@ -1,0 +1,113 @@
+---
+# Himalaya email CLI installation and configuration
+
+- name: Check if Himalaya is installed
+  ansible.builtin.stat:
+    path: "{{ openclaw_himalaya_bin }}"
+  register: himalaya_binary
+
+- name: Get installed Himalaya version
+  ansible.builtin.command: "{{ openclaw_himalaya_bin }} --version"
+  register: himalaya_version_check
+  changed_when: false
+  failed_when: false
+  when: himalaya_binary.stat.exists
+
+- name: Install Himalaya
+  when: not himalaya_binary.stat.exists
+  block:
+    - name: Download Himalaya install script
+      ansible.builtin.get_url:
+        url: https://raw.githubusercontent.com/pimalaya/himalaya/master/install.sh
+        dest: /tmp/himalaya-install.sh
+        mode: "0755"
+
+    - name: Run Himalaya install script
+      ansible.builtin.command: /tmp/himalaya-install.sh
+      args:
+        creates: "{{ openclaw_himalaya_bin }}"
+      environment:
+        PREFIX: /usr/local
+
+    - name: Clean up install script
+      ansible.builtin.file:
+        path: /tmp/himalaya-install.sh
+        state: absent
+
+- name: Verify Himalaya installation
+  ansible.builtin.command: "{{ openclaw_himalaya_bin }} --version"
+  register: himalaya_version
+  changed_when: false
+
+- name: Display Himalaya version
+  ansible.builtin.debug:
+    msg: "Himalaya version: {{ himalaya_version.stdout }}"
+
+- name: Ensure Himalaya config directory exists
+  ansible.builtin.file:
+    path: "{{ openclaw_himalaya_config_dir }}"
+    state: directory
+    owner: "{{ openclaw_user }}"
+    group: "{{ openclaw_group }}"
+    mode: "0700"
+
+- name: Deploy Himalaya configuration
+  ansible.builtin.template:
+    src: himalaya/config.toml.j2
+    dest: "{{ openclaw_himalaya_config_path }}"
+    owner: "{{ openclaw_user }}"
+    group: "{{ openclaw_group }}"
+    mode: "0600"
+  when: openclaw_himalaya_accounts | length > 0
+  notify: Restart openclaw
+
+# Verify IMAP folders exist (optional but recommended)
+- name: Verify IMAP folders for each account
+  when:
+    - openclaw_himalaya_accounts | length > 0
+    - openclaw_himalaya_verify_folders | default(false)
+  block:
+    - name: List IMAP folders for each account
+      ansible.builtin.command:
+        cmd: "{{ openclaw_himalaya_bin }} folder list --account {{ item.name }}"
+      become: true
+      become_user: "{{ openclaw_user }}"
+      environment:
+        HOME: "{{ openclaw_home }}"
+        XDG_CONFIG_HOME: "{{ openclaw_home }}/.config"
+      register: folder_list
+      changed_when: false
+      failed_when: false
+      loop: "{{ openclaw_himalaya_accounts }}"
+      loop_control:
+        label: "{{ item.name }}"
+
+    - name: Display folder list results
+      ansible.builtin.debug:
+        msg: |
+          Account: {{ item.item.name }}
+          Folders: {{ item.stdout | default('(failed to list)') }}
+          {% if item.rc != 0 %}
+          Error: {{ item.stderr | default('unknown error') }}
+          {% endif %}
+      loop: "{{ folder_list.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"
+
+    - name: Create missing Sent folder if needed
+      ansible.builtin.command:
+        cmd: "{{ openclaw_himalaya_bin }} folder create --account {{ item.item.name }} '{{ item.item.folder_sent | default('Sent') }}'"
+      become: true
+      become_user: "{{ openclaw_user }}"
+      environment:
+        HOME: "{{ openclaw_home }}"
+        XDG_CONFIG_HOME: "{{ openclaw_home }}/.config"
+      when:
+        - item.rc == 0
+        - (item.item.folder_sent | default('Sent')) not in item.stdout
+      loop: "{{ folder_list.results }}"
+      loop_control:
+        label: "{{ item.item.name }}"
+      register: create_sent
+      failed_when: false
+      changed_when: create_sent.rc == 0

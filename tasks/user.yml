@@ -12,3 +12,13 @@
     shell: /bin/bash
     create_home: true
     system: true
+
+- name: Fetch openclaw user UID
+  ansible.builtin.command: "id -u {{ openclaw_user }}"
+  register: openclaw_user_uid_cmd
+  changed_when: false
+  become: true
+
+- name: Set openclaw user UID fact
+  ansible.builtin.set_fact:
+    openclaw_user_uid: "{{ openclaw_user_uid_cmd.stdout }}"
