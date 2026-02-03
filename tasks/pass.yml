@@ -5,6 +5,7 @@
 - name: Install pass and GPG packages
   ansible.builtin.package:
     name:
+      - acl
       - pass
       - gnupg
     state: present
