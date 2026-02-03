@@ -126,9 +126,11 @@ openclaw_nodejs_nodesource_repo: "node_{{ openclaw_nodejs_version }}.x"
 # MCP Servers Configuration
 openclaw_mcp_servers_enabled: true
 openclaw_mcp_servers: []
+openclaw_mcp_config_enabled: false
+openclaw_mcp_docker_optional: false
 
-# MCP servers par défaut (tous désactivés par défaut)
-openclaw_mcp_servers_defaults:
+# MCP servers catalog (full definitions)
+openclaw_mcp_servers_catalog:
   - name: filesystem
     enabled: false
     command: npx
@@ -168,6 +170,9 @@ openclaw_mcp_servers_defaults:
     env:
       DOCKER_HOST: "{{ openclaw_docker_host | default('unix:///var/run/docker.sock') }}"
     description: "Docker container management"
+
+# MCP servers par défaut (tous désactivés par défaut)
+openclaw_mcp_servers_defaults: "{{ openclaw_mcp_servers_catalog }}"
 
 # MCP tokens
 openclaw_github_token: ""

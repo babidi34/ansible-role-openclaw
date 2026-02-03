@@ -93,6 +93,38 @@ ansible-galaxy install babidi34.openclaw
             folder_sent: "Sent"  # Adjust to your server's folder name
 ```
 
+### With MCP Servers
+
+```yaml
+- hosts: openclaw_servers
+  become: yes
+  roles:
+    - role: babidi34.openclaw
+      vars:
+        # LLM Configuration
+        openclaw_llm_anthropic_api_key: "{{ vault_anthropic_key }}"
+        openclaw_model_primary: "anthropic/claude-sonnet-4-20250514"
+
+        # MCP servers
+        openclaw_mcp_servers_defaults:
+          - name: filesystem
+            enabled: true
+          - name: github
+            enabled: true
+          - name: docker
+            enabled: true
+
+        # Enable MCP config rendering (OpenClaw must support mcpServers)
+        openclaw_mcp_config_enabled: true
+
+        # Optional: allow missing docker.sock (skip hard assert)
+        openclaw_mcp_docker_optional: true
+
+        # MCP tokens
+        openclaw_github_token: "{{ vault_github_token }}"
+        openclaw_docker_host: "unix:///var/run/docker.sock"
+```
+
 ## Key Variables
 
 | Variable | Default | Description |

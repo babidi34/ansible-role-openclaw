@@ -13,43 +13,14 @@
     openclaw_mcp_servers_defaults:
       - name: filesystem
         enabled: true
-        command: npx
-        args:
-          - "-y"
-          - "@modelcontextprotocol/server-filesystem"
-          - "/home/openclaw/.openclaw/workspace"
-        description: "Access to workspace filesystem"
-
       - name: github
         enabled: true
-        command: npx
-        args:
-          - "-y"
-          - "@modelcontextprotocol/server-github"
-        env:
-          GITHUB_PERSONAL_ACCESS_TOKEN: "{{ openclaw_github_token }}"
-        description: "GitHub integration"
-
       - name: gitlab
-        enabled: false  # Set to true if needed
-        command: npx
-        args:
-          - "-y"
-          - "@modelcontextprotocol/server-gitlab"
-        env:
-          GITLAB_PERSONAL_ACCESS_TOKEN: "{{ openclaw_gitlab_token }}"
-          GITLAB_API_URL: "https://gitlab.com/api/v4"
-        description: "GitLab integration"
-
+        enabled: false
       - name: docker
         enabled: true
-        command: npx
-        args:
-          - "-y"
-          - "@modelcontextprotocol/server-docker"
-        env:
-          DOCKER_HOST: "unix:///var/run/docker.sock"
-        description: "Docker container management"
+    openclaw_mcp_config_enabled: true
+    openclaw_mcp_docker_optional: true
 
     # MCP Tokens
     openclaw_github_token: "{{ vault_github_token }}"

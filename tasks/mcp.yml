@@ -41,6 +41,16 @@
   when:
     - openclaw_mcp_servers_defaults | selectattr('name', 'equalto', 'docker') | selectattr('enabled', 'equalto', true) | list | length > 0
     - docker_socket is defined
+    - not openclaw_mcp_docker_optional | default(false)
+
+- name: Warn when Docker socket is missing but optional
+  ansible.builtin.debug:
+    msg: "Docker MCP enabled but docker.sock missing; skipping docker group setup (openclaw_mcp_docker_optional=true)"
+  when:
+    - openclaw_mcp_servers_defaults | selectattr('name', 'equalto', 'docker') | selectattr('enabled', 'equalto', true) | list | length > 0
+    - docker_socket is defined
+    - not docker_socket.stat.exists
+    - openclaw_mcp_docker_optional | default(false)
 
 - name: Add openclaw user to docker group
   ansible.builtin.user:
@@ -48,7 +58,10 @@
     groups: docker
     append: true
   become: true
-  when: openclaw_mcp_servers_defaults | selectattr('name', 'equalto', 'docker') | selectattr('enabled', 'equalto', true) | list | length > 0
+  when:
+    - openclaw_mcp_servers_defaults | selectattr('name', 'equalto', 'docker') | selectattr('enabled', 'equalto', true) | list | length > 0
+    - docker_socket is defined
+    - docker_socket.stat.exists
 
 # Display enabled MCP servers
 - name: List enabled MCP servers
