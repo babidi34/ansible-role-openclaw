@@ -52,6 +52,6 @@
 - name: Configure systemd service
   ansible.builtin.include_tasks: service.yml
 
-- name: Configure firewall
-  ansible.builtin.include_tasks: firewall.yml
-  when: openclaw_security_firewall | bool
+- name: Configure monitoring
+  ansible.builtin.include_tasks: monitoring.yml
+  when: openclaw_healthcheck_enabled | bool

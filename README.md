@@ -10,7 +10,7 @@ An Ansible role to deploy and configure [OpenClaw](https://openclaw.ai/), a pers
 - Multi-LLM provider support (Anthropic, OpenAI, Mistral, Google, OpenRouter, Ollama)
 - Telegram channel integration
 - **Himalaya email integration** with secure password storage via `pass`
-- Security hardening (systemd + firewall)
+- Security hardening (systemd)
 - Healthcheck monitoring
 
 ## Requirements

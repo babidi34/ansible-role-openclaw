@@ -1,5 +1,5 @@
 ---
-# Secure OpenClaw deployment with firewall and hardening
+# Secure OpenClaw deployment with hardening
 - name: Deploy OpenClaw (secure)
   hosts: all
   become: yes
@@ -11,7 +11,6 @@
 
     # Security
     openclaw_security_hardening: true
-    openclaw_security_firewall: true
     openclaw_gateway_password: "{{ vault_gateway_password }}"
 
     # Monitoring

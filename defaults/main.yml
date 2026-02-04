@@ -211,7 +211,6 @@ openclaw_credentials: {}
 
 # Security hardening
 openclaw_security_hardening: true
-openclaw_security_firewall: false
 
 # Network restrictions
 openclaw_gateway_public: false
