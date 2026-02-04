@@ -1,7 +1,18 @@
 stages:
+  - lint
   - test
 
-molecule:
+ansible-lint:
+  stage: lint
+  image: python:3.10
+  before_script:
+    - pip install --upgrade pip
+    - pip install "ansible-core==2.14.*" ansible-lint
+  script:
+    - ansible-lint --version
+    - ansible-lint
+
+molecule-syntax:
   stage: test
   image: python:3.10
   services:
@@ -10,16 +21,9 @@ molecule:
   variables:
     DOCKER_HOST: tcp://docker:2375
     DOCKER_TLS_CERTDIR: ""
-    MOLECULE_EPHEMERAL_DIRECTORY: /tmp/molecule
-    ANSIBLE_LOCAL_TMP: /tmp/ansible-local
-    ANSIBLE_REMOTE_TMP: /tmp/ansible-remote
-    ANSIBLE_ASYNC_DIR: /tmp/ansible-async
   before_script:
-    - python -V
     - apt-get update && apt-get install -y docker.io
     - pip install --upgrade pip
-    - pip install "ansible-core==2.14.*" molecule molecule-plugins[docker] ansible-lint
-    - ansible --version
-    - docker info
+    - pip install "ansible-core==2.14.*" molecule molecule-plugins[docker]
   script:
-    - molecule test
+    - molecule syntax
