@@ -2,7 +2,7 @@
 - name: Converge
   hosts: all
   roles:
-    - role: openclaw
+    - role: "{{ lookup('env', 'MOLECULE_PROJECT_DIRECTORY') }}"
       vars:
         openclaw_install_method: npm
         openclaw_llm_provider: "ollama"

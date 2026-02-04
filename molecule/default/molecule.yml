@@ -21,7 +21,6 @@ provisioner:
       async_dir: /tmp/ansible-async
   env:
     ANSIBLE_ASYNC_DIR: /tmp/ansible-async
-    ANSIBLE_ROLES_PATH: "${MOLECULE_PROJECT_DIRECTORY}/.."
   inventory:
     host_vars:
       ubuntu-22:
