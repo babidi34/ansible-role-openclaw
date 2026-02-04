@@ -2,11 +2,9 @@
 - name: Converge
   hosts: all
   roles:
-    - role: babidi34.moltbot
+    - role: openclaw
       vars:
-        moltbot_install_method: file
-        moltbot_install_script_file: moltbot-install.sh
-        moltbot_install_script_url: ""
-        moltbot_model_primary: dummy/model
-        moltbot_workspace_init: false
-        moltbot_enable_user_service: false
+        openclaw_install_method: npm
+        openclaw_llm_provider: "ollama"
+        openclaw_llm_ollama_base_url: "http://127.0.0.1:11434"
+        openclaw_workspace_init: false

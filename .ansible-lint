@@ -1,0 +1,16 @@
+---
+# Ansible-lint configuration
+
+# Exclude paths from linting
+exclude_paths:
+  - examples/
+  - tests/
+  - molecule/
+
+# Skip specific rules
+skip_list:
+  - role-name  # We use paths in test playbooks
+
+# Warn only for these rules
+warn_list:
+  - command-instead-of-module

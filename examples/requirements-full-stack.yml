@@ -1,0 +1,18 @@
+---
+# Ansible Galaxy requirements for full-stack secure deployment
+#
+# Install with:
+#   ansible-galaxy install -r requirements-full-stack.yml
+
+roles:
+  - src: git+https://gitlab.com/babidi34/ansible-role-secure-os.git
+    name: secure-os
+    version: master
+
+  - src: git+https://gitlab.com/babidi34/ansible-role-ssh-key-deploy.git
+    name: ssh-key-deploy
+    version: master
+
+  - src: git+https://gitlab.com/babidi34/ansible-role-openclaw.git
+    name: openclaw
+    version: main

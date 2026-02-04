@@ -17,9 +17,18 @@
   when: nodejs_current_version.rc == 0
 
 # Install Node.js if version is too old or not installed
-- name: Add NodeSource APT repository
-  ansible.builtin.shell: |
-    curl -fsSL https://deb.nodesource.com/setup_{{ openclaw_nodejs_version }}.x | bash -
+- name: Download NodeSource setup script
+  ansible.builtin.get_url:
+    url: "https://deb.nodesource.com/setup_{{ openclaw_nodejs_version }}.x"
+    dest: /tmp/nodesource_setup.sh
+    mode: "0755"
+  become: true
+  when: >
+    nodejs_current_version.rc != 0 or
+    (nodejs_version_major is defined and nodejs_version_major | int < openclaw_nodejs_version | int)
+
+- name: Run NodeSource setup script
+  ansible.builtin.command: /tmp/nodesource_setup.sh
   args:
     creates: /etc/apt/sources.list.d/nodesource.list
   become: true

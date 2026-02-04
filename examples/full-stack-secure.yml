@@ -1,0 +1,129 @@
+---
+# Full-stack secure OpenClaw deployment
+# Uses 3 roles:
+#   1. secure-os: SSH hardening, fail2ban, firewall
+#   2. ssh-key-deploy: Create admin user with SSH key and sudo
+#   3. openclaw: Deploy OpenClaw AI assistant
+#
+# Requirements file (requirements.yml):
+#   ---
+#   roles:
+#     - src: git+https://gitlab.com/babidi34/ansible-role-secure-os.git
+#       name: secure-os
+#     - src: git+https://gitlab.com/babidi34/ansible-role-ssh-key-deploy.git
+#       name: ssh-key-deploy
+#     - src: git+https://gitlab.com/babidi34/ansible-role-openclaw.git
+#       name: openclaw
+#
+# Install roles:
+#   ansible-galaxy install -r requirements.yml
+#
+# Run playbook:
+#   ansible-playbook -i inventory full-stack-secure.yml --ask-vault-pass
+
+- name: Deploy secure OpenClaw server
+  hosts: openclaw_servers
+  become: true
+
+  vars:
+    # ===========================================
+    # Admin user (ssh-key-deploy role)
+    # ===========================================
+    new_users:
+      - user: admin
+        sudo: true
+        ssh_pub_key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIExampleKeyChangeThisToYourRealPublicKey admin@example.com"
+
+    # ===========================================
+    # SSH & Security hardening (secure-os role)
+    # ===========================================
+    ssh_port: 22
+    ssh_allow_users:
+      - admin
+      - openclaw
+    ssh_passwordauthentication: 'no'
+    ssh_permit_root_login: 'no'
+    ssh_max_auth_tries: 3
+
+    # Fail2ban
+    use_fail2ban: true
+    fail2ban_sshd_maxretry: 3
+    fail2ban_sshd_bantime: 3600
+    fail2ban_sshd_findtime: 600
+
+    # Firewall - allow SSH and OpenClaw gateway (if exposed)
+    authorized_ports_tcp:
+      - port: "{{ ssh_port }}"
+      # Uncomment to expose OpenClaw gateway externally (not recommended)
+      # - port: 18789
+      #   source: "trusted-host.example.com"
+
+    # ===========================================
+    # OpenClaw configuration (openclaw role)
+    # ===========================================
+
+    # LLM Provider
+    openclaw_llm_provider: "anthropic"
+    openclaw_llm_anthropic_api_key: "{{ vault_anthropic_api_key }}"
+
+    # Alternative providers (uncomment as needed):
+    # openclaw_llm_provider: "openai"
+    # openclaw_llm_openai_api_key: "{{ vault_openai_api_key }}"
+    #
+    # openclaw_llm_provider: "ollama"
+    # openclaw_llm_ollama_base_url: "http://127.0.0.1:11434"
+
+    # Gateway security
+    openclaw_gateway_bind: "loopback"
+    openclaw_gateway_port: 18789
+    openclaw_gateway_password: "{{ vault_openclaw_gateway_password }}"
+
+    # Security hardening
+    openclaw_security_hardening: true
+
+    # Workspace markdown files (optional - customize agent behavior)
+    # openclaw_workspace_files:
+    #   - name: AGENTS.md
+    #     src: "{{ playbook_dir }}/files/openclaw/AGENTS.md"
+    #   - name: SOUL.md
+    #     src: "{{ playbook_dir }}/files/openclaw/SOUL.md"
+    #   - name: BOOTSTRAP.md
+    #     src: ""
+    #   - name: IDENTITY.md
+    #     src: ""
+    #   - name: TOOLS.md
+    #     src: ""
+    #   - name: USER.md
+    #     src: ""
+
+    # Telegram integration (optional)
+    # openclaw_telegram_enabled: true
+    # openclaw_telegram_bot_token: "{{ vault_telegram_bot_token }}"
+    # openclaw_telegram_allow_from:
+    #   - "@your_telegram_username"
+
+    # MCP Servers (optional)
+    openclaw_mcp_servers_enabled: true
+    openclaw_mcp_config_enabled: true
+    openclaw_mcp_servers:
+      - name: filesystem
+        enabled: true
+        command: npx
+        args:
+          - "-y"
+          - "@modelcontextprotocol/server-filesystem"
+          - "/home/openclaw/.openclaw/workspace"
+
+    # Healthcheck monitoring
+    openclaw_healthcheck_enabled: true
+
+  roles:
+    # Order matters: security first, then user, then application
+    - role: secure-os
+      tags: [security, ssh, firewall]
+
+    - role: ssh-key-deploy
+      tags: [users, ssh]
+
+    - role: openclaw
+      tags: [openclaw, app]

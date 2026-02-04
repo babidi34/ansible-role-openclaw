@@ -2,7 +2,7 @@
 # Test playbook for Vagrant VM
 - name: Test OpenClaw deployment on VM
   hosts: all
-  become: yes
+  become: true
 
   vars:
     # Test configuration
@@ -20,17 +20,17 @@
           - "/home/openclaw/.openclaw/workspace"
 
   roles:
-    - role: ../../  # Path to role from tests directory
+    - role: openclaw
 
   post_tasks:
     - name: Wait for OpenClaw service to start
-      wait_for:
+      ansible.builtin.wait_for:
         port: 18789
         host: localhost
         timeout: 60
 
     - name: Test gateway health endpoint
-      uri:
+      ansible.builtin.uri:
         url: http://localhost:18789/health
         status_code: 200
         timeout: 10
@@ -39,29 +39,29 @@
       register: health_check
 
     - name: Display health check result
-      debug:
+      ansible.builtin.debug:
         var: health_check
 
     - name: Verify OpenClaw binary exists
-      command: which openclaw
+      ansible.builtin.command: which openclaw
       register: openclaw_bin
       changed_when: false
 
     - name: Display OpenClaw binary path
-      debug:
+      ansible.builtin.debug:
         var: openclaw_bin.stdout
 
     - name: Verify configuration file exists
-      stat:
+      ansible.builtin.stat:
         path: /home/openclaw/.openclaw/openclaw.json
       register: config_file
 
     - name: Assert configuration exists
-      assert:
+      ansible.builtin.assert:
         that:
           - config_file.stat.exists
         fail_msg: "OpenClaw configuration file not found"
 
     - name: Display success message
-      debug:
-        msg: "OpenClaw deployment test PASSED ✓"
+      ansible.builtin.debug:
+        msg: "OpenClaw deployment test PASSED"

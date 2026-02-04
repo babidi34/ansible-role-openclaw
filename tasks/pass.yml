@@ -82,6 +82,7 @@
         HOME: "{{ openclaw_home }}"
         GNUPGHOME: "{{ openclaw_home }}/.gnupg"
       register: gpg_gen_result
+      changed_when: true
 
     - name: Clean up GPG key batch file
       ansible.builtin.file:
@@ -129,6 +130,7 @@
     PASSWORD_STORE_DIR: "{{ openclaw_pass_store_dir }}"
     GNUPGHOME: "{{ openclaw_home }}/.gnupg"
   when: not pass_store_init.stat.exists
+  changed_when: true
 
 - name: Ensure pass store has correct permissions
   ansible.builtin.file:
@@ -164,8 +166,11 @@
 
 # Export GPG key to controller for backup
 - name: Set GPG backup path
+  vars:
+    _default_backup_path: "{{ playbook_dir }}/credentials/gpg-{{ inventory_hostname }}.asc"
   ansible.builtin.set_fact:
-    _openclaw_gpg_backup_file: "{{ openclaw_pass_gpg_backup_path if openclaw_pass_gpg_backup_path | length > 0 else playbook_dir + '/credentials/gpg-' + inventory_hostname + '.asc' }}"
+    _openclaw_gpg_backup_file: >-
+      {{ openclaw_pass_gpg_backup_path if openclaw_pass_gpg_backup_path | length > 0 else _default_backup_path }}
   when: openclaw_pass_gpg_backup | bool
 
 - name: Export GPG private key

@@ -65,5 +65,9 @@
 
 # Display enabled MCP servers
 - name: List enabled MCP servers
+  vars:
+    _default_servers: >-
+      {{ openclaw_mcp_servers_defaults | selectattr('enabled', 'equalto', true) | map(attribute='name') | list }}
+    _custom_servers: "{{ openclaw_mcp_servers | map(attribute='name') | list }}"
   ansible.builtin.debug:
-    msg: "Enabled MCP servers: {{ (openclaw_mcp_servers_defaults | selectattr('enabled', 'equalto', true) | map(attribute='name') | list) + (openclaw_mcp_servers | map(attribute='name') | list) }}"
+    msg: "Enabled MCP servers: {{ _default_servers + _custom_servers }}"

@@ -1,0 +1,21 @@
+---
+# Example vault file for full-stack-secure.yml playbook
+#
+# Copy this file to vault.yml and encrypt it:
+#   cp vault.yml.example vault.yml
+#   ansible-vault encrypt vault.yml
+#
+# Edit encrypted vault:
+#   ansible-vault edit vault.yml
+
+# OpenClaw gateway password
+vault_openclaw_gateway_password: "change-me-strong-password"
+
+# LLM API keys (uncomment the one you use)
+vault_anthropic_api_key: "sk-ant-api03-..."
+# vault_openai_api_key: "sk-..."
+# vault_mistral_api_key: "..."
+# vault_google_api_key: "..."
+
+# Telegram bot token (optional)
+# vault_telegram_bot_token: "123456789:ABCdefGHI..."

@@ -18,10 +18,10 @@ provisioner:
     defaults:
       local_tmp: /tmp/ansible-local
       remote_tmp: /var/tmp/ansible-remote
-      roles_path: /tmp/ansible-roles:/home/linux-man/.ansible/roles:/etc/ansible/roles:/usr/share/ansible/roles
       async_dir: /tmp/ansible-async
   env:
     ANSIBLE_ASYNC_DIR: /tmp/ansible-async
+    ANSIBLE_ROLES_PATH: "${MOLECULE_PROJECT_DIRECTORY}/.."
   inventory:
     host_vars:
       ubuntu-22:

@@ -1,0 +1,14 @@
+# Example inventory for full-stack-secure.yml playbook
+#
+# Copy and adapt to your needs:
+#   cp inventory.example inventory
+
+[openclaw_servers]
+openclaw.example.com ansible_user=root
+
+# Or with specific SSH settings:
+# openclaw.example.com ansible_user=root ansible_port=22 ansible_host=192.168.1.100
+
+# Multiple servers:
+# openclaw-prod.example.com ansible_user=root
+# openclaw-staging.example.com ansible_user=root

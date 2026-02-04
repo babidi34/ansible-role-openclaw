@@ -52,12 +52,14 @@
     cmd: pnpm install && pnpm build
     chdir: /tmp/openclaw-source
   when: openclaw_install_method == "npm-source"
+  changed_when: true
 
 - name: Link OpenClaw binary from source
   ansible.builtin.command:
     cmd: pnpm link --global
     chdir: /tmp/openclaw-source
   when: openclaw_install_method == "npm-source"
+  changed_when: true
 
 # Legacy install script support (deprecated)
 - name: Download OpenClaw install script
