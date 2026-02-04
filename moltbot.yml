@@ -1,7 +1,0 @@
----
-- name: Lancer le rôle ansible-role-moltbot
-  hosts: "{{ target | default('debian13-test') }}"
-  become: true
-  roles:
-    - secure-os
-    - /home/karim/ansible-roles/ansible-role-moltbot
