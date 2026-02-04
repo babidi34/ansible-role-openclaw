@@ -8,6 +8,9 @@
 - name: Create directories
   ansible.builtin.include_tasks: directories.yml
 
+- name: Install base packages
+  ansible.builtin.include_tasks: packages.yml
+
 - name: Install Node.js (if using npm method)
   ansible.builtin.include_tasks: nodejs.yml
   when: openclaw_install_method in ['npm', 'npm-source'] and openclaw_nodejs_install | bool
@@ -34,6 +37,10 @@
 - name: Deploy credentials
   ansible.builtin.include_tasks: credentials.yml
   when: openclaw_credentials | length > 0
+
+- name: Configure secure command wrappers
+  ansible.builtin.include_tasks: wrappers.yml
+  when: openclaw_secure_wrappers | length > 0
 
 - name: Ensure workspace files
   ansible.builtin.include_tasks: workspace_files.yml

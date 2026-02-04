@@ -1,0 +1,7 @@
+#!/bin/bash
+# {{ ansible_managed }}
+# User-callable wrapper for {{ item.name }}
+# This script calls the privileged wrapper via sudo
+# Security: This file must be owned by root:root with mode 0755
+
+exec sudo {{ openclaw_secure_wrappers_libexec_dir }}/{{ item.name }}-exec "$@"

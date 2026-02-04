@@ -1,0 +1,23 @@
+#!/bin/bash
+# {{ ansible_managed }}
+# Privileged wrapper for {{ item.name }}
+# This script is executed via sudo and reads the token from a protected file
+# Security: This file must be owned by root:root with mode 0755
+
+set -euo pipefail
+
+TOKEN_FILE="{{ openclaw_secure_wrappers_secrets_dir }}/{{ item.name }}_token"
+TARGET_BIN="{{ item.target }}"
+
+if [[ ! -f "$TOKEN_FILE" ]]; then
+    echo "Error: Token file not found" >&2
+    exit 1
+fi
+
+if [[ ! -x "$TARGET_BIN" ]]; then
+    echo "Error: Target binary not found or not executable: $TARGET_BIN" >&2
+    exit 1
+fi
+
+export {{ item.env_var }}="$(cat "$TOKEN_FILE")"
+exec "$TARGET_BIN" "$@"

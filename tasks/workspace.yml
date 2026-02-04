@@ -1,10 +1,10 @@
 ---
 - name: Initialize workspace (manual step placeholder)
-  ansible.builtin.command: "{{ moltbot_cli_name }} setup"
+  ansible.builtin.command: "{{ openclaw_cli_name }} setup"
   become: true
-  become_user: "{{ moltbot_user }}"
+  become_user: "{{ openclaw_user }}"
   environment:
-    HOME: "{{ moltbot_home }}"
+    HOME: "{{ openclaw_home }}"
   args:
-    creates: "{{ moltbot_workspace_dir }}/AGENTS.md"
-  when: moltbot_workspace_init | bool
+    creates: "{{ openclaw_workspace_dir }}/AGENTS.md"
+  when: openclaw_workspace_init | bool

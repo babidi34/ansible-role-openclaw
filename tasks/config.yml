@@ -1,5 +1,5 @@
 ---
-- name: Render Moltbot JSON config
+- name: Render openclaw JSON config
   ansible.builtin.template:
     src: openclaw.json.j2
     dest: "{{ openclaw_config_path }}"
@@ -8,7 +8,7 @@
     mode: "{{ openclaw_config_mode }}"
   notify: Restart openclaw
 
-- name: Render Moltbot .env
+- name: Render openclaw .env
   ansible.builtin.template:
     src: openclaw.env.j2
     dest: "{{ openclaw_env_path }}"

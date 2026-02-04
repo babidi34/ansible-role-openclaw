@@ -1,5 +1,5 @@
 ---
-- name: Create Moltbot directories
+- name: Create openclaw directories
   ansible.builtin.file:
     path: "{{ item }}"
     state: directory
