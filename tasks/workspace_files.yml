@@ -1,10 +1,35 @@
 ---
-- name: Ensure workspace files exist
-  ansible.builtin.file:
-    path: "{{ openclaw_workspace_dir }}/{{ item }}"
-    state: touch
+# Deploy workspace markdown files
+# If 'src' is provided: upload the file from the local path
+# If 'src' is empty or not defined: create an empty file (touch)
+
+- name: Upload workspace files with custom content
+  ansible.builtin.copy:
+    src: "{{ item.src }}"
+    dest: "{{ openclaw_workspace_dir }}/{{ item.name }}"
     owner: "{{ openclaw_user }}"
     group: "{{ openclaw_group }}"
     mode: "0640"
   loop: "{{ openclaw_workspace_files }}"
-  when: openclaw_workspace_init | bool
+  loop_control:
+    label: "{{ item.name }}"
+  when:
+    - openclaw_workspace_init | bool
+    - item.src is defined
+    - item.src | length > 0
+
+- name: Create empty workspace files
+  ansible.builtin.file:
+    path: "{{ openclaw_workspace_dir }}/{{ item.name }}"
+    state: touch
+    owner: "{{ openclaw_user }}"
+    group: "{{ openclaw_group }}"
+    mode: "0640"
+    modification_time: preserve
+    access_time: preserve
+  loop: "{{ openclaw_workspace_files }}"
+  loop_control:
+    label: "{{ item.name }}"
+  when:
+    - openclaw_workspace_init | bool
+    - item.src is not defined or item.src | length == 0

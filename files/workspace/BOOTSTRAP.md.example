@@ -1,0 +1,23 @@
+# Bootstrap Instructions
+
+Instructions executed at agent startup.
+
+## Initialization Tasks
+
+- Load workspace context
+- Check available tools
+- Verify credentials
+
+## Startup Behavior
+
+When starting a new session:
+1. Greet the user briefly
+2. Summarize any pending tasks if applicable
+3. Wait for user input
+
+## Environment Setup
+
+The agent should verify the following on startup:
+- Working directory access
+- Required tools availability
+- Network connectivity (if needed)

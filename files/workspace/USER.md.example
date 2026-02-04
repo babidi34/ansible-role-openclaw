@@ -1,0 +1,24 @@
+# User Profile
+
+## Preferences
+
+- Language: English
+- Verbosity: Concise
+- Code style: Follow project conventions
+
+## Context
+
+Add relevant information about the user or project context here.
+
+## Projects
+
+List active projects or repositories the agent should be aware of.
+
+## Credentials & Access
+
+Note: Do not store actual credentials here.
+Reference which services the user has configured access to.
+
+## Custom Instructions
+
+Add any user-specific instructions or preferences here.

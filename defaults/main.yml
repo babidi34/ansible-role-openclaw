@@ -39,13 +39,31 @@ openclaw_install_flags:
 # Workspace (new openclaw structure)
 openclaw_workspace_dir: "{{ openclaw_upstream_dir }}/workspace"
 openclaw_workspace_init: true
+
+# Workspace markdown files configuration
+# Each file can optionally have a 'src' path to upload content from local file
+# If 'src' is empty or not defined, an empty file is created (touch)
+# Example:
+#   openclaw_workspace_files:
+#     - name: AGENTS.md
+#       src: "/path/to/my/custom/AGENTS.md"
+#     - name: SOUL.md
+#       src: ""  # empty file will be created
+#     - name: TOOLS.md
+#       # no src key = empty file
 openclaw_workspace_files:
-  - AGENTS.md
-  - BOOTSTRAP.md
-  - IDENTITY.md
-  - SOUL.md
-  - TOOLS.md
-  - USER.md
+  - name: AGENTS.md
+    src: ""
+  - name: BOOTSTRAP.md
+    src: ""
+  - name: IDENTITY.md
+    src: ""
+  - name: SOUL.md
+    src: ""
+  - name: TOOLS.md
+    src: ""
+  - name: USER.md
+    src: ""
 
 # Systemd service
 openclaw_service_unit_path: /etc/systemd/system/openclaw.service
