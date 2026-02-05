@@ -1,0 +1,7 @@
+---
+- name: Install base packages
+  ansible.builtin.package:
+    name: "{{ openclaw_packages }}"
+    state: present
+  become: true
+  when: openclaw_packages | length > 0
