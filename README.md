@@ -139,6 +139,19 @@ ansible-galaxy install babidi34.openclaw
 | `openclaw_telegram_dm_policy` | `pairing` | DM policy: `pairing`, `allowlist`, or `open` |
 | `openclaw_telegram_allow_from` | `[]` | List of allowed Telegram user IDs |
 | `openclaw_security_hardening` | `true` | Enable systemd security hardening |
+| `openclaw_cli_env_vars` | `[]` | CLI tokens injected into service environment |
+
+### CLI Environment Variables
+
+Inject tokens directly into the systemd service environment for CLI tools like `gh` and `glab`:
+
+```yaml
+openclaw_cli_env_vars:
+  - env_var: GH_TOKEN
+    token: "{{ vault_github_token }}"
+  - env_var: GITLAB_TOKEN
+    token: "{{ vault_gitlab_token }}"
+```
 
 ### Himalaya Email Variables
 

@@ -38,10 +38,6 @@
   ansible.builtin.include_tasks: credentials.yml
   when: openclaw_credentials | length > 0
 
-- name: Configure secure command wrappers
-  ansible.builtin.include_tasks: wrappers.yml
-  when: openclaw_secure_wrappers | length > 0
-
 - name: Ensure workspace files
   ansible.builtin.include_tasks: workspace_files.yml
 

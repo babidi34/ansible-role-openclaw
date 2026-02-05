@@ -293,23 +293,16 @@ openclaw_himalaya_reply_policy: "disabled"
 # Set API key to enable web search
 openclaw_brave_api_key: ""
 
-# Secure command wrappers
-# Allows the agent to use CLI tools (gh, glab, curl) without seeing the tokens
-# Tokens are stored in /etc/openclaw/secrets/ (root-only readable)
-# Wrappers use sudo to inject tokens transparently
+# CLI environment variables
+# Inject tokens directly into the systemd service environment
+# The agent can use CLI tools (gh, glab) with tokens available in environment
 # Example:
-#   openclaw_secure_wrappers:
-#     - name: gh                              # wrapper name (installed as /usr/local/bin/gh)
-#       target: /usr/bin/gh                   # actual binary to wrap
+#   openclaw_cli_env_vars:
+#     - env_var: GH_TOKEN                     # environment variable name
 #       token: "{{ vault_github_token }}"     # token value (use ansible-vault)
-#       env_var: GITHUB_TOKEN                 # environment variable to inject
-#     - name: glab
-#       target: /usr/bin/glab
+#     - env_var: GITLAB_TOKEN
 #       token: "{{ vault_gitlab_token }}"
-#       env_var: GITLAB_TOKEN
-openclaw_secure_wrappers: []
-openclaw_secure_wrappers_secrets_dir: /etc/openclaw/secrets
-openclaw_secure_wrappers_libexec_dir: /usr/local/libexec/openclaw
+openclaw_cli_env_vars: []
 
 # Pass (password-store) integration
 # Provides secure password storage for Himalaya email credentials
