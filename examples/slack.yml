@@ -1,0 +1,17 @@
+---
+# OpenClaw with Slack channel enabled (Socket Mode)
+- hosts: openclaw
+  roles:
+    - role: ansible-role-openclaw
+      vars:
+        openclaw_slack_enabled: true
+
+        # Prefer putting tokens in Ansible Vault
+        openclaw_slack_bot_token: "{{ vault_slack_bot_token }}"   # xoxb-...
+        openclaw_slack_app_token: "{{ vault_slack_app_token }}"   # xapp-...
+
+        # Allowlist: keys can be either channel IDs (C...) or names (#channel)
+        openclaw_slack_channels:
+          "#openclaw":
+            allow: true
+            requireMention: true

@@ -6,6 +6,13 @@
     fail_msg: "Set openclaw_telegram_bot_token when Telegram is enabled"
   when: openclaw_telegram_enabled | bool
 
-- name: Configure channels (placeholder)
-  ansible.builtin.debug:
-    msg: "Channel configuration is provider-specific; use openclaw CLI or API."
+- name: Validate Slack channel settings
+  ansible.builtin.assert:
+    that:
+      - openclaw_slack_bot_token | length > 0
+      - openclaw_slack_app_token | length > 0
+      - openclaw_slack_channels | length > 0
+    fail_msg: >-
+      Set openclaw_slack_bot_token, openclaw_slack_app_token, and openclaw_slack_channels
+      when Slack is enabled.
+  when: openclaw_slack_enabled | bool

@@ -108,6 +108,20 @@ openclaw_telegram_allow_from: []
 openclaw_telegram_groups: {}
 openclaw_telegram_config_writes: false
 
+# Slack channel (Socket Mode)
+# Supports both channel IDs (C123...) and names (#general) as map keys.
+openclaw_slack_enabled: false
+openclaw_slack_bot_token: ""  # xoxb-...
+openclaw_slack_app_token: ""  # xapp-...
+openclaw_slack_allow_bots: false
+openclaw_slack_config_writes: true
+openclaw_slack_channels: {}
+# Example:
+# openclaw_slack_channels:
+#   "#openclaw":
+#     allow: true
+#     requireMention: true
+
 # LLM providers
 openclaw_llm_provider: ""  # openai|anthropic|mistral|google|openrouter|ollama
 openclaw_llm_api_key: ""
