@@ -95,6 +95,8 @@ ansible-galaxy install babidi34.openclaw
 
 ### With MCP Servers
 
+> ⚠️ **Important:** the `mcpServers` function is currently not working in OpenClaw. Do **not** use MCP-related variables for now.
+
 ```yaml
 - hosts: openclaw_servers
   become: yes
@@ -126,6 +128,8 @@ ansible-galaxy install babidi34.openclaw
 ```
 
 ## Key Variables
+
+> ⚠️ **Note:** MCP-related variables are currently **disabled** because OpenClaw `mcpServers` is not functional.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
