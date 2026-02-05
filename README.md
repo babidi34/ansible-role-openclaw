@@ -9,6 +9,7 @@ An Ansible role to deploy and configure [OpenClaw](https://openclaw.ai/), a pers
 - Secure credential management with Ansible Vault
 - Multi-LLM provider support (Anthropic, OpenAI, Mistral, Google, OpenRouter, Ollama)
 - Telegram channel integration
+- Slack channel integration (Socket Mode)
 - **Himalaya email integration** with secure password storage via `pass`
 - Security hardening (systemd)
 - Healthcheck monitoring
@@ -136,6 +137,7 @@ ansible-galaxy install babidi34.openclaw
 | `openclaw_user` | `openclaw` | System user for the service |
 | `openclaw_model_primary` | `""` | Primary LLM model (e.g., `mistral/mistral-large-latest`) |
 | `openclaw_telegram_enabled` | `false` | Enable Telegram channel |
+| `openclaw_slack_enabled` | `false` | Enable Slack channel (Socket Mode) |
 | `openclaw_telegram_dm_policy` | `pairing` | DM policy: `pairing`, `allowlist`, or `open` |
 | `openclaw_telegram_allow_from` | `[]` | List of allowed Telegram user IDs |
 | `openclaw_security_hardening` | `true` | Enable systemd security hardening |

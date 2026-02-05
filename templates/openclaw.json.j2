@@ -44,6 +44,13 @@
       "allowFrom": openclaw_telegram_allow_from,
       "groups": openclaw_telegram_groups,
       "configWrites": openclaw_telegram_config_writes
+    }}) %}{% endif %}{% if openclaw_slack_enabled %}{% set _ = channels.update({"slack": {
+      "enabled": true,
+      "botToken": "${SLACK_BOT_TOKEN}",
+      "appToken": "${SLACK_APP_TOKEN}",
+      "allowBots": openclaw_slack_allow_bots,
+      "configWrites": openclaw_slack_config_writes,
+      "channels": openclaw_slack_channels
     }}) %}{% endif %}{% if channels | length > 0 %},
   "channels": {{ channels | to_nice_json }}{% endif %}{% if openclaw_telegram_enabled %},
   "plugins": {
