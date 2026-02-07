@@ -8,3 +8,4 @@ test.yml
 .env
 credentials/
 *.asc
+deploy-openclaw.yml
