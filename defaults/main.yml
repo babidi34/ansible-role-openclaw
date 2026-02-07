@@ -161,7 +161,7 @@ openclaw_nodejs_install: true
 openclaw_nodejs_nodesource_repo: "node_{{ openclaw_nodejs_version }}.x"
 
 # MCP Servers Configuration
-openclaw_mcp_servers_enabled: true
+openclaw_mcp_servers_enabled: false
 openclaw_mcp_servers: []
 openclaw_mcp_config_enabled: false
 openclaw_mcp_docker_optional: false
