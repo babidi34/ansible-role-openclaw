@@ -21,9 +21,9 @@
 - name: Validate LLM settings
   ansible.builtin.include_tasks: llm.yml
 
-- name: Validate MCP servers configuration
+- name: Install and configure mcporter (MCP bridge)
   ansible.builtin.include_tasks: mcp.yml
-  when: openclaw_mcp_servers_enabled | bool and openclaw_mcp_config_enabled | bool
+  when: openclaw_mcporter_enabled | bool
 
 - name: Validate actions settings
   ansible.builtin.include_tasks: actions.yml

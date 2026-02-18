@@ -160,62 +160,22 @@ openclaw_nodejs_version: "22"
 openclaw_nodejs_install: true
 openclaw_nodejs_nodesource_repo: "node_{{ openclaw_nodejs_version }}.x"
 
-# MCP Servers Configuration
-openclaw_mcp_servers_enabled: false
-openclaw_mcp_servers: []
-openclaw_mcp_config_enabled: false
-openclaw_mcp_docker_optional: false
-
-# MCP servers catalog (full definitions)
-openclaw_mcp_servers_catalog:
-  - name: filesystem
-    enabled: false
-    command: npx
-    args:
-      - "-y"
-      - "@modelcontextprotocol/server-filesystem"
-      - "{{ openclaw_workspace_dir }}"
-    description: "Access to workspace filesystem"
-
-  - name: github
-    enabled: false
-    command: npx
-    args:
-      - "-y"
-      - "@modelcontextprotocol/server-github"
-    env:
-      GITHUB_PERSONAL_ACCESS_TOKEN: "{{ openclaw_github_token | default('') }}"
-    description: "GitHub integration (issues, PRs, repos)"
-
-  - name: gitlab
-    enabled: false
-    command: npx
-    args:
-      - "-y"
-      - "@modelcontextprotocol/server-gitlab"
-    env:
-      GITLAB_PERSONAL_ACCESS_TOKEN: "{{ openclaw_gitlab_token | default('') }}"
-      GITLAB_API_URL: "{{ openclaw_gitlab_api_url | default('https://gitlab.com/api/v4') }}"
-    description: "GitLab integration (issues, MRs, repos)"
-
-  - name: docker
-    enabled: false
-    command: npx
-    args:
-      - "-y"
-      - "@modelcontextprotocol/server-docker"
-    env:
-      DOCKER_HOST: "{{ openclaw_docker_host | default('unix:///var/run/docker.sock') }}"
-    description: "Docker container management"
-
-# MCP servers par défaut (tous désactivés par défaut)
-openclaw_mcp_servers_defaults: "{{ openclaw_mcp_servers_catalog }}"
-
-# MCP tokens
-openclaw_github_token: ""
-openclaw_gitlab_token: ""
-openclaw_gitlab_api_url: "https://gitlab.com/api/v4"
-openclaw_docker_host: "unix:///var/run/docker.sock"
+# mcporter — MCP servers via the mcporter skill (bundled with OpenClaw)
+# OpenClaw does NOT support native mcpServers in openclaw.json.
+# mcporter acts as a CLI bridge to MCP servers.
+# Requires sandbox.mode: "off" (the Docker sandbox lacks Node.js).
+openclaw_mcporter_enabled: false
+openclaw_mcporter_config_dir: "{{ openclaw_home }}/.mcporter"
+openclaw_mcporter_config_path: "{{ openclaw_home }}/.mcporter/mcporter.json"
+openclaw_mcporter_servers: {}
+# Example:
+#   openclaw_mcporter_servers:
+#     context7:
+#       command: npx
+#       args: ["-y", "@upstash/context7-mcp"]
+#     filesystem:
+#       command: npx
+#       args: ["-y", "@modelcontextprotocol/server-filesystem", "/home/openclaw/.openclaw/workspace"]
 
 # Credentials management
 openclaw_credentials: {}

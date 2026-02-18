@@ -1,73 +1,47 @@
 ---
-# Validate MCP servers configuration
-- name: Verify npx is available (required for MCP servers)
+# Install and configure mcporter (MCP bridge for OpenClaw)
+
+- name: Verify npx is available (required for mcporter)
   ansible.builtin.command: npx --version
   register: npx_version
   changed_when: false
   failed_when: npx_version.rc != 0
 
-- name: Display npx version
-  ansible.builtin.debug:
-    msg: "npx version: {{ npx_version.stdout }}"
-
-# Validate GitHub MCP server configuration
-- name: Check GitHub MCP server token
-  ansible.builtin.assert:
-    that:
-      - openclaw_github_token | length > 0
-    fail_msg: "GitHub MCP server is enabled but openclaw_github_token is not set"
-  when: openclaw_mcp_servers_defaults | selectattr('name', 'equalto', 'github') | selectattr('enabled', 'equalto', true) | list | length > 0
-
-# Validate GitLab MCP server configuration
-- name: Check GitLab MCP server token
-  ansible.builtin.assert:
-    that:
-      - openclaw_gitlab_token | length > 0
-    fail_msg: "GitLab MCP server is enabled but openclaw_gitlab_token is not set"
-  when: openclaw_mcp_servers_defaults | selectattr('name', 'equalto', 'gitlab') | selectattr('enabled', 'equalto', true) | list | length > 0
-
-# Validate Docker MCP server configuration
-- name: Check Docker socket access for MCP Docker server
-  ansible.builtin.stat:
-    path: /var/run/docker.sock
-  register: docker_socket
-  when: openclaw_mcp_servers_defaults | selectattr('name', 'equalto', 'docker') | selectattr('enabled', 'equalto', true) | list | length > 0
-
-- name: Ensure Docker socket exists
-  ansible.builtin.assert:
-    that:
-      - docker_socket.stat.exists
-    fail_msg: "Docker MCP server is enabled but Docker socket not found at /var/run/docker.sock"
-  when:
-    - openclaw_mcp_servers_defaults | selectattr('name', 'equalto', 'docker') | selectattr('enabled', 'equalto', true) | list | length > 0
-    - docker_socket is defined
-    - not openclaw_mcp_docker_optional | default(false)
-
-- name: Warn when Docker socket is missing but optional
-  ansible.builtin.debug:
-    msg: "Docker MCP enabled but docker.sock missing; skipping docker group setup (openclaw_mcp_docker_optional=true)"
-  when:
-    - openclaw_mcp_servers_defaults | selectattr('name', 'equalto', 'docker') | selectattr('enabled', 'equalto', true) | list | length > 0
-    - docker_socket is defined
-    - not docker_socket.stat.exists
-    - openclaw_mcp_docker_optional | default(false)
-
-- name: Add openclaw user to docker group
-  ansible.builtin.user:
-    name: "{{ openclaw_user }}"
-    groups: docker
-    append: true
+- name: Install mcporter globally
+  community.general.npm:
+    name: mcporter
+    global: true
+    state: present
   become: true
-  when:
-    - openclaw_mcp_servers_defaults | selectattr('name', 'equalto', 'docker') | selectattr('enabled', 'equalto', true) | list | length > 0
-    - docker_socket is defined
-    - docker_socket.stat.exists
 
-# Display enabled MCP servers
-- name: List enabled MCP servers
-  vars:
-    _default_servers: >-
-      {{ openclaw_mcp_servers_defaults | selectattr('enabled', 'equalto', true) | map(attribute='name') | list }}
-    _custom_servers: "{{ openclaw_mcp_servers | map(attribute='name') | list }}"
+- name: Verify mcporter is installed
+  ansible.builtin.command: mcporter --version
+  register: mcporter_version
+  changed_when: false
+  failed_when: mcporter_version.rc != 0
+
+- name: Display mcporter version
   ansible.builtin.debug:
-    msg: "Enabled MCP servers: {{ _default_servers + _custom_servers }}"
+    msg: "mcporter version: {{ mcporter_version.stdout }}"
+
+- name: Create mcporter config directory
+  ansible.builtin.file:
+    path: "{{ openclaw_mcporter_config_dir }}"
+    state: directory
+    owner: "{{ openclaw_user }}"
+    group: "{{ openclaw_group }}"
+    mode: "0750"
+
+- name: Deploy mcporter configuration
+  ansible.builtin.template:
+    src: mcporter.json.j2
+    dest: "{{ openclaw_mcporter_config_path }}"
+    owner: "{{ openclaw_user }}"
+    group: "{{ openclaw_group }}"
+    mode: "0640"
+  notify: Restart openclaw
+
+- name: List configured MCP servers
+  ansible.builtin.debug:
+    msg: "mcporter MCP servers: {{ openclaw_mcporter_servers | dict2items | map(attribute='key') | list }}"
+  when: openclaw_mcporter_servers | length > 0
