@@ -102,12 +102,14 @@
     # openclaw_telegram_allow_from:
     #   - "@your_telegram_username"
 
-    # MCP Servers (optional)
-    openclaw_mcp_servers_enabled: true
-    openclaw_mcp_config_enabled: true
-    openclaw_mcp_servers:
-      - name: filesystem
-        enabled: true
+    # MCP Servers via mcporter (optional)
+    openclaw_sandbox_mode: "off"
+    openclaw_mcporter_enabled: true
+    openclaw_mcporter_servers:
+      context7:
+        command: npx
+        args: ["-y", "@upstash/context7-mcp"]
+      filesystem:
         command: npx
         args:
           - "-y"

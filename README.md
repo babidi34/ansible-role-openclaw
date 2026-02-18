@@ -1,11 +1,11 @@
 # Ansible Role: OpenClaw
 
-An Ansible role to deploy and configure [OpenClaw](https://openclaw.ai/), a personal AI assistant with MCP server support.
+An Ansible role to deploy and configure [OpenClaw](https://openclaw.ai/), a personal AI assistant with MCP server support via mcporter.
 
 ## Features
 
 - Multiple installation methods (npm recommended)
-- MCP Server support (Filesystem, GitHub, GitLab, Docker)
+- MCP Server support via **mcporter** (Context7, Filesystem, GitHub, GitLab, etc.)
 - Secure credential management with Ansible Vault
 - Multi-LLM provider support (Anthropic, OpenAI, Mistral, Google, OpenRouter, Ollama)
 - Telegram channel integration
@@ -60,6 +60,40 @@ ansible-galaxy install babidi34.openclaw
           - 123456789  # Your Telegram user ID
 ```
 
+### With MCP Servers (via mcporter)
+
+OpenClaw does not support native `mcpServers` in its config. This role uses **mcporter**, a bundled OpenClaw skill that acts as a CLI bridge to MCP servers.
+
+> **Note:** mcporter requires `openclaw_sandbox_mode: "off"` because the Docker sandbox image lacks Node.js.
+
+```yaml
+- hosts: openclaw_servers
+  become: yes
+  roles:
+    - role: babidi34.openclaw
+      vars:
+        openclaw_model_primary: "anthropic/claude-sonnet-4-20250514"
+        openclaw_llm_anthropic_api_key: "{{ vault_anthropic_key }}"
+
+        # Disable sandbox (required for mcporter)
+        openclaw_sandbox_mode: "off"
+
+        # MCP Servers via mcporter
+        openclaw_mcporter_enabled: true
+        openclaw_mcporter_servers:
+          context7:
+            command: npx
+            args: ["-y", "@upstash/context7-mcp"]
+          filesystem:
+            command: npx
+            args: ["-y", "@modelcontextprotocol/server-filesystem", "/home/openclaw/.openclaw/workspace"]
+          github:
+            command: npx
+            args: ["-y", "@modelcontextprotocol/server-github"]
+            env:
+              GITHUB_PERSONAL_ACCESS_TOKEN: "{{ vault_github_token }}"
+```
+
 ### With Himalaya Email (Secure)
 
 ```yaml
@@ -94,54 +128,37 @@ ansible-galaxy install babidi34.openclaw
             folder_sent: "Sent"  # Adjust to your server's folder name
 ```
 
-### With MCP Servers
-
-> ⚠️ **Important:** the `mcpServers` function is currently not working in OpenClaw. Do **not** use MCP-related variables for now.
-
-```yaml
-- hosts: openclaw_servers
-  become: yes
-  roles:
-    - role: babidi34.openclaw
-      vars:
-        # LLM Configuration
-        openclaw_llm_anthropic_api_key: "{{ vault_anthropic_key }}"
-        openclaw_model_primary: "anthropic/claude-sonnet-4-20250514"
-
-        # MCP servers
-        openclaw_mcp_servers_defaults:
-          - name: filesystem
-            enabled: true
-          - name: github
-            enabled: true
-          - name: docker
-            enabled: true
-
-        # Enable MCP config rendering (OpenClaw must support mcpServers)
-        openclaw_mcp_config_enabled: true
-
-        # Optional: allow missing docker.sock (skip hard assert)
-        openclaw_mcp_docker_optional: true
-
-        # MCP tokens
-        openclaw_github_token: "{{ vault_github_token }}"
-        openclaw_docker_host: "unix:///var/run/docker.sock"
-```
-
 ## Key Variables
-
-> ⚠️ **Note:** MCP-related variables are currently **disabled** because OpenClaw `mcpServers` is not functional.
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `openclaw_user` | `openclaw` | System user for the service |
 | `openclaw_model_primary` | `""` | Primary LLM model (e.g., `mistral/mistral-large-latest`) |
+| `openclaw_sandbox_mode` | `non-main` | Sandbox mode: `off`, `non-main`, `all` |
 | `openclaw_telegram_enabled` | `false` | Enable Telegram channel |
 | `openclaw_slack_enabled` | `false` | Enable Slack channel (Socket Mode) |
 | `openclaw_telegram_dm_policy` | `pairing` | DM policy: `pairing`, `allowlist`, or `open` |
 | `openclaw_telegram_allow_from` | `[]` | List of allowed Telegram user IDs |
 | `openclaw_security_hardening` | `true` | Enable systemd security hardening |
 | `openclaw_cli_env_vars` | `[]` | CLI tokens injected into service environment |
+
+### mcporter (MCP Servers) Variables
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `openclaw_mcporter_enabled` | `false` | Enable mcporter MCP bridge |
+| `openclaw_mcporter_servers` | `{}` | Dict of MCP servers to configure |
+
+Each server entry follows the standard MCP format:
+
+```yaml
+openclaw_mcporter_servers:
+  server_name:
+    command: npx               # Command to run
+    args: ["-y", "package"]    # Arguments
+    env:                       # Optional environment variables
+      API_KEY: "{{ vault_key }}"
+```
 
 ### CLI Environment Variables
 

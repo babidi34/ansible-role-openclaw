@@ -6,7 +6,7 @@
 
   vars:
     # LLM Configuration
-    openclaw_llm_provider: "anthropic"
+    openclaw_model_primary: "anthropic/claude-sonnet-4-20250514"
     openclaw_llm_anthropic_api_key: "{{ vault_anthropic_key }}"
 
     # Security
@@ -16,15 +16,13 @@
     # Monitoring
     openclaw_healthcheck_enabled: true
 
-    # MCP Servers (secure setup)
-    openclaw_mcp_servers_defaults:
-      - name: filesystem
-        enabled: true
+    # MCP Servers via mcporter (optional)
+    openclaw_sandbox_mode: "off"
+    openclaw_mcporter_enabled: true
+    openclaw_mcporter_servers:
+      context7:
         command: npx
-        args:
-          - "-y"
-          - "@modelcontextprotocol/server-filesystem"
-          - "/home/openclaw/.openclaw/workspace"
+        args: ["-y", "@upstash/context7-mcp"]
 
   roles:
     - role: openclaw

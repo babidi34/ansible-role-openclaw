@@ -29,16 +29,7 @@
       "mode": "{{ openclaw_tailscale_mode }}",
       "resetOnExit": {{ openclaw_tailscale_reset_on_exit | lower }}
     }{% endif %}
-  }{% set mcp_overrides = {} %}{% for item in openclaw_mcp_servers_defaults %}{% set _ = mcp_overrides.update({(item.name): item}) %}{% endfor %}{% set enabled_defaults = [] %}{% for item in openclaw_mcp_servers_catalog %}{% if mcp_overrides.get(item.name) is defined and (mcp_overrides.get(item.name).enabled | default(false)) %}{% set _ = enabled_defaults.append(item | combine(mcp_overrides.get(item.name)) | combine({'enabled': true})) %}{% endif %}{% endfor %}{% set all_mcp_servers = enabled_defaults + openclaw_mcp_servers %}{% if openclaw_mcp_config_enabled | default(false) and openclaw_mcp_servers_enabled and all_mcp_servers | length > 0 %},
-  "mcpServers": {
-    {% for server in all_mcp_servers %}
-    "{{ server.name }}": {
-      "command": "{{ server.command }}",
-      "args": {{ server.args | to_json }}{% if server.env is defined and server.env | length > 0 %},
-      "env": {{ server.env | to_json }}{% endif %}
-    }{% if not loop.last %},{% endif %}
-    {% endfor %}
-  }{% endif %}{% set channels = {} %}{% if openclaw_telegram_enabled %}{% set _ = channels.update({"telegram": {
+  }{% set channels = {} %}{% if openclaw_telegram_enabled %}{% set _ = channels.update({"telegram": {
       "botToken": "${TELEGRAM_BOT_TOKEN}",
       "dmPolicy": openclaw_telegram_dm_policy,
       "allowFrom": openclaw_telegram_allow_from,
