@@ -24,6 +24,9 @@
     "auth": {
       "mode": "token",
       "token": "${{ openclaw_gateway_auth_env }}"
+    },
+    "remote": {
+      "token": "${{ openclaw_gateway_auth_env }}"
     }{% endif %}{% if openclaw_tailscale_enabled %},
     "tailscale": {
       "mode": "{{ openclaw_tailscale_mode }}",
