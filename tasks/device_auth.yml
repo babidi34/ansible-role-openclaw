@@ -1,0 +1,61 @@
+---
+# Sync device auth tokens from paired.json → device-auth.json
+# Needed when the gateway has a paired device record but
+# device-auth.json tokens are empty
+# (e.g. after a fresh deploy where gateway.remote.token was previously missing)
+
+- name: Check device identity and paired files
+  ansible.builtin.stat:
+    path: "{{ item }}"
+  register: _oc_device_files
+  loop:
+    - "{{ openclaw_upstream_dir }}/identity/device-auth.json"
+    - "{{ openclaw_upstream_dir }}/devices/paired.json"
+
+- name: Read device-auth.json and paired.json
+  ansible.builtin.slurp:
+    src: "{{ item }}"
+  register: _oc_device_slurp
+  loop:
+    - "{{ openclaw_upstream_dir }}/identity/device-auth.json"
+    - "{{ openclaw_upstream_dir }}/devices/paired.json"
+  when: _oc_device_files.results | map(attribute='stat.exists') | list | min
+
+- name: Set device auth and paired facts
+  ansible.builtin.set_fact:
+    _oc_device_auth: >-
+      {{ _oc_device_slurp.results[0].content | b64decode | from_json }}
+    _oc_paired: >-
+      {{ _oc_device_slurp.results[1].content | b64decode | from_json }}
+  when:
+    - _oc_device_slurp is not skipped
+    - _oc_device_slurp.results | length == 2
+
+- name: Initialize token accumulator
+  ansible.builtin.set_fact:
+    _oc_synced_tokens: {}
+  when:
+    - _oc_device_auth is defined
+    - _oc_paired is defined
+    - _oc_device_auth.deviceId in _oc_paired
+    - not _oc_device_auth.tokens
+
+- name: Build synced token map (role → token object)
+  ansible.builtin.set_fact:
+    _oc_synced_tokens: >-
+      {{ _oc_synced_tokens | combine({item.key: item.value}) }}
+  loop: "{{ _oc_paired[_oc_device_auth.deviceId].tokens | dict2items }}"
+  when:
+    - _oc_synced_tokens is defined
+    - _oc_device_auth.deviceId in _oc_paired
+
+- name: Write device-auth.json with synced tokens
+  ansible.builtin.copy:
+    content: >-
+      {{ _oc_device_auth | combine({'tokens': _oc_synced_tokens})
+      | to_nice_json }}
+    dest: "{{ openclaw_upstream_dir }}/identity/device-auth.json"
+    owner: "{{ openclaw_user }}"
+    group: "{{ openclaw_group }}"
+    mode: '0600'
+  when: _oc_synced_tokens is defined and _oc_synced_tokens | length > 0
