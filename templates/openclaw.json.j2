@@ -22,7 +22,9 @@
       "password": "{{ openclaw_gateway_password }}"
     }{% elif openclaw_gateway_auth_token | length > 0 %},
     "auth": {
-      "mode": "token",
+      "mode": "token"
+    },
+    "remote": {
       "token": "${{ openclaw_gateway_auth_env }}"
     }{% endif %}{% if openclaw_tailscale_enabled %},
     "tailscale": {
@@ -43,14 +45,7 @@
       "configWrites": openclaw_slack_config_writes,
       "channels": openclaw_slack_channels
     }}) %}{% endif %}{% if channels | length > 0 %},
-  "channels": {{ channels | to_nice_json }}{% endif %}{% if openclaw_telegram_enabled %},
-  "plugins": {
-    "entries": {
-      "telegram": {
-        "enabled": true
-      }
-    }
-  }{% endif %}{% if openclaw_himalaya_enabled %},
+  "channels": {{ channels | to_nice_json }}{% endif %}{% if openclaw_himalaya_enabled %},
   "skills": {
     "entries": {
       "himalaya": {

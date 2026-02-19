@@ -55,6 +55,18 @@
 - name: Configure systemd service
   ansible.builtin.include_tasks: service.yml
 
+- name: Flush handlers (apply pending service restarts)
+  ansible.builtin.meta: flush_handlers
+
+- name: Wait for openclaw gateway to be listening
+  ansible.builtin.wait_for:
+    port: "{{ openclaw_gateway_port }}"
+    host: 127.0.0.1
+    timeout: 60
+
+- name: Sync device auth tokens if needed
+  ansible.builtin.include_tasks: device_auth.yml
+
 - name: Configure monitoring
   ansible.builtin.include_tasks: monitoring.yml
   when: openclaw_healthcheck_enabled | bool
