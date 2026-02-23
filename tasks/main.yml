@@ -64,6 +64,36 @@
     host: 127.0.0.1
     timeout: 60
 
+- name: Ensure Telegram plugin is loaded
+  when: openclaw_telegram_enabled | bool
+  block:
+    - name: Check Telegram plugin status
+      become: true
+      become_user: "{{ openclaw_user }}"
+      ansible.builtin.command:
+        cmd: "{{ openclaw_cli_bin }} plugins list"
+      register: _oc_plugins_list
+      changed_when: false
+
+    - name: Enable Telegram plugin if not loaded
+      become: true
+      become_user: "{{ openclaw_user }}"
+      ansible.builtin.command:
+        cmd: "{{ openclaw_cli_bin }} plugins enable telegram"
+      when: _oc_plugins_list.stdout | regex_search('telegram.*disabled')
+      changed_when: true
+      notify: Restart openclaw
+
+- name: Flush handlers (apply plugin restarts)
+  ansible.builtin.meta: flush_handlers
+
+- name: Wait for openclaw gateway (post plugin setup)
+  ansible.builtin.wait_for:
+    port: "{{ openclaw_gateway_port }}"
+    host: 127.0.0.1
+    timeout: 60
+  when: openclaw_telegram_enabled | bool
+
 - name: Sync device auth tokens if needed
   ansible.builtin.include_tasks: device_auth.yml
 
