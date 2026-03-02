@@ -31,21 +31,24 @@
       "mode": "{{ openclaw_tailscale_mode }}",
       "resetOnExit": {{ openclaw_tailscale_reset_on_exit | lower }}
     }{% endif %}
-  }{% set channels = {} %}{% if openclaw_telegram_enabled %}{% set _ = channels.update({"telegram": {
+  }{% set channels = {} %}{% set plugins_entries = {} %}{% if openclaw_telegram_enabled %}{% set _ = channels.update({"telegram": {
       "botToken": "${TELEGRAM_BOT_TOKEN}",
       "dmPolicy": openclaw_telegram_dm_policy,
       "allowFrom": openclaw_telegram_allow_from,
       "groups": openclaw_telegram_groups,
       "configWrites": openclaw_telegram_config_writes
-    }}) %}{% endif %}{% if openclaw_slack_enabled %}{% set _ = channels.update({"slack": {
+    }}) %}{% set _ = plugins_entries.update({"telegram": {"enabled": true}}) %}{% endif %}{% if openclaw_slack_enabled %}{% set _ = channels.update({"slack": {
       "enabled": true,
       "botToken": "${SLACK_BOT_TOKEN}",
       "appToken": "${SLACK_APP_TOKEN}",
       "allowBots": openclaw_slack_allow_bots,
       "configWrites": openclaw_slack_config_writes,
       "channels": openclaw_slack_channels
-    }}) %}{% endif %}{% if channels | length > 0 %},
-  "channels": {{ channels | to_nice_json }}{% endif %}{% if openclaw_himalaya_enabled %},
+    }}) %}{% set _ = plugins_entries.update({"slack": {"enabled": true}}) %}{% endif %}{% if channels | length > 0 %},
+  "channels": {{ channels | to_nice_json }}{% endif %}{% if plugins_entries | length > 0 %},
+  "plugins": {
+    "entries": {{ plugins_entries | to_nice_json }}
+  }{% endif %}{% if openclaw_himalaya_enabled %},
   "skills": {
     "entries": {
       "himalaya": {
@@ -55,5 +58,6 @@
         }
       }
     }
-  }{% endif %}
+  }{% endif %}{% set browser_cfg = {} %}{% if not openclaw_browser_enabled %}{% set _ = browser_cfg.update({"enabled": false}) %}{% endif %}{% if openclaw_browser_headless %}{% set _ = browser_cfg.update({"headless": true}) %}{% endif %}{% if openclaw_browser_no_sandbox %}{% set _ = browser_cfg.update({"noSandbox": true}) %}{% endif %}{% if openclaw_browser_default_profile | length > 0 %}{% set _ = browser_cfg.update({"defaultProfile": openclaw_browser_default_profile}) %}{% endif %}{% if openclaw_browser_executable_path | length > 0 %}{% set _ = browser_cfg.update({"executablePath": openclaw_browser_executable_path}) %}{% endif %}{% if browser_cfg | length > 0 %},
+  "browser": {{ browser_cfg | to_nice_json }}{% endif %}
 }

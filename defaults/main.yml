@@ -160,6 +160,15 @@ openclaw_nodejs_version: "22"
 openclaw_nodejs_install: true
 openclaw_nodejs_nodesource_repo: "node_{{ openclaw_nodejs_version }}.x"
 
+# Browser configuration
+# Controls OpenClaw's native browser (Playwright/Chromium) used by the browser tool
+# noSandbox MUST be true when systemd service has NoNewPrivileges=yes (server deployments)
+openclaw_browser_enabled: true
+openclaw_browser_headless: false      # true = headless (required on servers without display)
+openclaw_browser_no_sandbox: false    # true = disable Chromium sandbox (required with NoNewPrivileges=yes)
+openclaw_browser_default_profile: "" # e.g. "openclaw" for headless, "chrome" for extension relay
+openclaw_browser_executable_path: "" # optional: override auto-detected Chromium path
+
 # mcporter — MCP servers via the mcporter skill (bundled with OpenClaw)
 # OpenClaw does NOT support native mcpServers in openclaw.json.
 # mcporter acts as a CLI bridge to MCP servers.
