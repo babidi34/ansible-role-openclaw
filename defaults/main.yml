@@ -123,16 +123,30 @@ openclaw_slack_channels: {}
 #     requireMention: true
 
 # LLM providers
-openclaw_llm_provider: ""  # openai|anthropic|mistral|google|openrouter|ollama
+openclaw_llm_provider: ""
 openclaw_llm_api_key: ""
 openclaw_llm_model: ""
 openclaw_llm_base_url: ""
 openclaw_llm_timeout: 60
-openclaw_llm_openai_api_key: ""
-openclaw_llm_anthropic_api_key: ""
-openclaw_llm_mistral_api_key: ""
-openclaw_llm_google_api_key: ""
-openclaw_llm_openrouter_api_key: ""
+openclaw_llm_providers:
+  - name: openai
+    env_var: OPENAI_API_KEY
+    api_key: ""
+  - name: anthropic
+    env_var: ANTHROPIC_API_KEY
+    api_key: ""
+  - name: mistral
+    env_var: MISTRAL_API_KEY
+    api_key: ""
+  - name: google
+    env_var: GOOGLE_API_KEY
+    api_key: ""
+  - name: openrouter
+    env_var: OPENROUTER_API_KEY
+    api_key: ""
+  - name: zai
+    env_var: ZAI_API_KEY
+    api_key: ""
 openclaw_llm_ollama_base_url: "http://127.0.0.1:11434"
 
 # Actions policy

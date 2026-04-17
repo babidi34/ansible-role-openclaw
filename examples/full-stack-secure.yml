@@ -64,12 +64,15 @@
 
     # LLM Provider
     openclaw_llm_provider: "anthropic"
-    openclaw_llm_anthropic_api_key: "{{ vault_anthropic_api_key }}"
+    openclaw_llm_providers:
+      - name: anthropic
+        env_var: ANTHROPIC_API_KEY
+        api_key: "{{ vault_anthropic_api_key }}"
+      # - name: openai
+      #   env_var: OPENAI_API_KEY
+      #   api_key: "{{ vault_openai_api_key }}"
 
-    # Alternative providers (uncomment as needed):
-    # openclaw_llm_provider: "openai"
-    # openclaw_llm_openai_api_key: "{{ vault_openai_api_key }}"
-    #
+    # Alternative: Ollama (local)
     # openclaw_llm_provider: "ollama"
     # openclaw_llm_ollama_base_url: "http://127.0.0.1:11434"
 

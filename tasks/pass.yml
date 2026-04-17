@@ -148,6 +148,7 @@
     echo "{{ item.password }}" | pass insert -e -f "mail/{{ item.name }}"
   args:
     executable: /bin/bash
+    chdir: "{{ openclaw_home }}"
   become: true
   become_user: "{{ openclaw_user }}"
   environment:

@@ -7,7 +7,7 @@ An Ansible role to deploy and configure [OpenClaw](https://openclaw.ai/), a pers
 - Multiple installation methods (npm recommended)
 - MCP Server support via **mcporter** (Context7, Filesystem, GitHub, GitLab, etc.)
 - Secure credential management with Ansible Vault
-- Multi-LLM provider support (Anthropic, OpenAI, Mistral, Google, OpenRouter, Ollama)
+- Multi-LLM provider support (Anthropic, OpenAI, Mistral, Google, OpenRouter, ZAI, Ollama)
 - Telegram channel integration
 - Slack channel integration (Socket Mode)
 - **Himalaya email integration** with secure password storage via `pass`
@@ -37,7 +37,10 @@ ansible-galaxy install babidi34.openclaw
     - role: babidi34.openclaw
       vars:
         openclaw_model_primary: "anthropic/claude-sonnet-4-20250514"
-        openclaw_llm_anthropic_api_key: "{{ vault_anthropic_key }}"
+        openclaw_llm_providers:
+          - name: anthropic
+            env_var: ANTHROPIC_API_KEY
+            api_key: "{{ vault_anthropic_key }}"
 ```
 
 ### With Telegram and Mistral
@@ -50,7 +53,10 @@ ansible-galaxy install babidi34.openclaw
       vars:
         # LLM Configuration
         openclaw_model_primary: "mistral/mistral-large-latest"
-        openclaw_llm_mistral_api_key: "{{ vault_mistral_key }}"
+        openclaw_llm_providers:
+          - name: mistral
+            env_var: MISTRAL_API_KEY
+            api_key: "{{ vault_mistral_key }}"
 
         # Telegram Configuration
         openclaw_telegram_enabled: true
@@ -73,7 +79,10 @@ OpenClaw does not support native `mcpServers` in its config. This role uses **mc
     - role: babidi34.openclaw
       vars:
         openclaw_model_primary: "anthropic/claude-sonnet-4-20250514"
-        openclaw_llm_anthropic_api_key: "{{ vault_anthropic_key }}"
+        openclaw_llm_providers:
+          - name: anthropic
+            env_var: ANTHROPIC_API_KEY
+            api_key: "{{ vault_anthropic_key }}"
 
         # Disable sandbox (required for mcporter)
         openclaw_sandbox_mode: "off"
@@ -103,7 +112,10 @@ OpenClaw does not support native `mcpServers` in its config. This role uses **mc
     - role: babidi34.openclaw
       vars:
         openclaw_model_primary: "anthropic/claude-sonnet-4-20250514"
-        openclaw_llm_anthropic_api_key: "{{ vault_anthropic_key }}"
+        openclaw_llm_providers:
+          - name: anthropic
+            env_var: ANTHROPIC_API_KEY
+            api_key: "{{ vault_anthropic_key }}"
 
         # Himalaya Email Configuration
         openclaw_himalaya_enabled: true
@@ -194,14 +206,18 @@ openclaw_cli_env_vars:
 
 ## LLM Providers
 
-Configure one of the following API keys:
+Configure providers via `openclaw_llm_providers` list:
 
-- `openclaw_llm_anthropic_api_key` - Anthropic (Claude)
-- `openclaw_llm_openai_api_key` - OpenAI (GPT)
-- `openclaw_llm_mistral_api_key` - Mistral
-- `openclaw_llm_google_api_key` - Google (Gemini)
-- `openclaw_llm_openrouter_api_key` - OpenRouter
-- `openclaw_llm_ollama_base_url` - Ollama (local)
+```yaml
+openclaw_llm_providers:
+  - name: anthropic        # Provider name
+    env_var: ANTHROPIC_API_KEY  # Environment variable exported
+    api_key: "{{ vault_key }}"  # API key value
+```
+
+Supported providers: `openai`, `anthropic`, `mistral`, `google`, `openrouter`, `zai`.
+
+For Ollama (local): use `openclaw_llm_ollama_base_url` instead.
 
 ## Himalaya Email Integration
 

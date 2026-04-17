@@ -7,7 +7,10 @@
   vars:
     # LLM Configuration
     openclaw_model_primary: "anthropic/claude-sonnet-4-20250514"
-    openclaw_llm_anthropic_api_key: "{{ vault_anthropic_key }}"
+    openclaw_llm_providers:
+      - name: anthropic
+        env_var: ANTHROPIC_API_KEY
+        api_key: "{{ vault_anthropic_key }}"
 
     # Security
     openclaw_security_hardening: true

@@ -14,8 +14,13 @@
       - "openai/gpt-3.5-turbo"
 
     # API Keys for all providers
-    openclaw_llm_anthropic_api_key: "{{ vault_anthropic_key }}"
-    openclaw_llm_openai_api_key: "{{ vault_openai_key }}"
+    openclaw_llm_providers:
+      - name: anthropic
+        env_var: ANTHROPIC_API_KEY
+        api_key: "{{ vault_anthropic_key }}"
+      - name: openai
+        env_var: OPENAI_API_KEY
+        api_key: "{{ vault_openai_key }}"
 
     # Sandbox configuration
     openclaw_sandbox_mode: "non-main"
